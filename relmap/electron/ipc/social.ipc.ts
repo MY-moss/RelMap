@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron'
+import { logIpcError } from '../logger'
 import type {
   Result,
   SocialAccount,

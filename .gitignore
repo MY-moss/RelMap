@@ -32,8 +32,14 @@ release_new2/
 coverage/
 
 # User data & assets
-public/assets/
-logs/
+relmap/public/assets/
+relmap/logs/
+relmap/.running
+relmap/plugins-state.json
+relmap/chi_sim.traineddata
+relmap/eng.traineddata
+relmap/scripts/seed-data.mjs
+relmap/tests/benchmarks/results/
 *.db
 *.key
 *.pem

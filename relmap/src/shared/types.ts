@@ -826,6 +826,7 @@ export interface ElectronAPI {
     setMainIdentity(id: string): Promise<Result<Person>>;
     getMainIdentity(): Promise<Result<Person | null>>;
     uploadAvatar(personId: string, base64Data: string): Promise<Result<string>>;
+    getAvatarDataUrl(personId: string): Promise<Result<string | null>>;
   };
   social: {
     create(data: CreateSocialAccountDto): Promise<Result<SocialAccount>>;

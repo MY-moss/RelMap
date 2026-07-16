@@ -28,6 +28,15 @@ export interface ReminderFilter {
 export function createReminder(data: CreateReminderDto): Result<Reminder> {
   try {
     const db = getDb()
+
+    if (!data.remind_date || !/^\d{4}-\d{2}-\d{2}$/.test(data.remind_date)) {
+      return { success: false, error: '提醒日期格式无效，应为 YYYY-MM-DD' }
+    }
+    const parsed = new Date(data.remind_date)
+    if (Number.isNaN(parsed.getTime())) {
+      return { success: false, error: '提醒日期不是有效日期' }
+    }
+
     const id = randomUUID()
     const repeatType = data.repeat_type ?? 'once'
 

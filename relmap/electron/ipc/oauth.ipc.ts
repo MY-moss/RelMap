@@ -143,7 +143,7 @@ export function registerOAuthIPC(): void {
         const authWindow = new BrowserWindow({
           width: 600,
           height: 700,
-          title: `RelMap — ${provider} 授权`,
+          title: `RelMap �?${provider} 授权`,
           webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,

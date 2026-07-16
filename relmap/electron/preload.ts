@@ -25,6 +25,7 @@ const api: ElectronAPI = {
     setMainIdentity: (id) => ipcRenderer.invoke('person:setMainIdentity', id),
     getMainIdentity: () => ipcRenderer.invoke('person:getMainIdentity'),
     uploadAvatar: (personId, base64Data) => ipcRenderer.invoke('person:uploadAvatar', personId, base64Data),
+    getAvatarDataUrl: (personId) => ipcRenderer.invoke('person:getAvatarDataUrl', personId),
   },
   social: {
     create: (data) => ipcRenderer.invoke('social:create', data),

@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron'
+import { logIpcError } from '../logger'
 import {
   createRelationship,
   updateRelationship,
@@ -32,10 +33,10 @@ export function registerRelationIPC(): void {
           const relatedName = relatedResult.success ? relatedResult.data.name : '未知'
           createReminder({
             person_id: data.person_id,
-            title: `${personName} 和 ${relatedName} 的纪念日`,
+            title: `${personName} �?${relatedName} 的纪念日`,
             remind_date: data.meet_date,
             repeat_type: 'yearly',
-            note: `自动为${personName}和${relatedName}创建的纪念日提醒（认识日期）`,
+            note: `自动�?{personName}�?{relatedName}创建的纪念日提醒（认识日期）`,
           })
         }
         return result

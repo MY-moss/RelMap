@@ -31,6 +31,6 @@ nsis:
   shortcutName: RelMap
   deleteAppDataOnUninstall: false
 
-npmRebuild: true
-nodeGypRebuild: true
-buildDependenciesFromSource: true
+npmRebuild: false
+nodeGypRebuild: false
+buildDependenciesFromSource: false

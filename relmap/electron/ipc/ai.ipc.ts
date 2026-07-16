@@ -4,7 +4,7 @@ import { scanCard } from '../../src/main/ai/ocr'
 import { detectFaces } from '../../src/main/ai/face'
 import { detectLostContacts } from '../../src/main/ai/lost_contact'
 import type { OcrResult, FaceDetection, LostContactItem } from '../../src/shared/types'
-
+import { logIpcError } from '../logger'
 import fs from 'node:fs'
 import path from 'node:path'
 

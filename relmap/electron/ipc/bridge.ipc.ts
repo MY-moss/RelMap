@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron'
+import { logIpcError } from '../logger'
 import { detectBridges } from '../../src/main/ai/bridge_detector'
 import type { BridgePerson } from '../../src/shared/types'
 import type { Result } from '../../src/shared/types'

@@ -36,6 +36,13 @@ export class Sandbox {
     this.onLog = handler
   }
 
+  private normalizeCode(code: string): string {
+    return code
+      .replace(/^export\s+default\s+/gm, '')
+      .replace(/^export\s+/gm, '')
+      .trim()
+  }
+
   async start(pluginDir: string, mainFile: string): Promise<void> {
     const mainPath = path.resolve(pluginDir, mainFile)
     if (!mainPath.startsWith(path.resolve(pluginDir))) {
@@ -44,6 +51,8 @@ export class Sandbox {
     if (!fs.existsSync(mainPath)) {
       throw new Error(`Sandbox: main file not found: ${mainPath}`)
     }
+
+    const pluginCode = this.normalizeCode(fs.readFileSync(mainPath, 'utf-8'))
 
     const workerCode = `
       const { parentPort } = require('worker_threads');
@@ -73,23 +82,22 @@ export class Sandbox {
       };
 
       const context = vm.createContext(sandboxGlobal);
-      let pluginExports = null;
 
       parentPort.on('message', async (msg) => {
         try {
           if (msg.type === 'init') {
-            const script = new vm.SourceTextModule(msg.payload.code, {
-              context,
-              url: msg.payload.filename,
-            });
-            await script.link(() => { throw new Error('Plugin cannot use require/import'); });
-            await script.evaluate();
-            pluginExports = script.namespace;
+            const script = new vm.Script(
+              'globalThis.__pluginSetupFn = (' + msg.payload.code + ')',
+              { filename: msg.payload.filename }
+            );
+            script.runInContext(context);
+            sandboxGlobal.__pluginSetupFn = typeof sandboxGlobal.__pluginSetupFn === 'function'
+              ? sandboxGlobal.__pluginSetupFn
+              : null;
             parentPort.postMessage({ type: 'init', id: msg.id, payload: 'ok' });
           } else if (msg.type === 'exec') {
-            if (pluginExports && typeof pluginExports.default === 'function') {
-              const api = msg.payload.api;
-              const result = await pluginExports.default(api);
+            if (typeof sandboxGlobal.__pluginSetupFn === 'function') {
+              const result = await sandboxGlobal.__pluginSetupFn(msg.payload.api);
               parentPort.postMessage({ type: 'result', id: msg.id, payload: result });
             } else {
               parentPort.postMessage({ type: 'result', id: msg.id, payload: null });
@@ -138,8 +146,7 @@ export class Sandbox {
       }
     })
 
-    const code = fs.readFileSync(mainPath, 'utf-8')
-    await this.postMessage('init', { code, filename: mainPath })
+    await this.postMessage('init', { code: pluginCode, filename: mainPath })
 
     this.msgResetTimer = setInterval(() => { this.msgCount = 0 }, 1000)
     this.healthCheckTimer = setInterval(() => this.healthCheck(), 15_000)

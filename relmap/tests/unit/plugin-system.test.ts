@@ -84,12 +84,12 @@ describe('PluginManager - Core', () => {
 
     const valid = ['my-plugin', 'ollama.bridge', 'test_v2', 'a', 'x'.repeat(100)]
     for (const name of valid) {
-      expect((pm as unknown as Record<string, unknown>).validatePluginName(name)).toBe(true)
+      expect((pm as unknown as Record<string, unknown>)['validatePluginName'](name)).toBe(true)
     }
 
     const invalid = ['', 'a'.repeat(101), '../evil', 'plugin/name', 'plugin\nname', null, undefined, 123]
     for (const name of invalid) {
-      expect((pm as unknown as Record<string, unknown>).validatePluginName(name)).toBe(false)
+      expect((pm as unknown as Record<string, unknown>)['validatePluginName'](name)).toBe(false)
     }
   })
 

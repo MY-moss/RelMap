@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron'
+import { logIpcError } from '../logger'
 import { calculateIntimacy } from '../../src/main/ai/intimacy'
 import type { IntimacyScore } from '../../src/main/ai/intimacy'
 import type { Result } from '../../src/shared/types'

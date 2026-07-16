@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron'
+import { logIpcError } from '../logger'
 import { generateSuggestions } from '../../src/main/ai/suggestion_engine'
 import type { SuggestionItem } from '../../src/shared/types'
 import type { Result } from '../../src/shared/types'

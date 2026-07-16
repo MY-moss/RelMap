@@ -1,9 +1,26 @@
 import { useEffect, useState, memo } from 'react'
 import type { Person, Tag } from '../../shared/types'
 
-// 将本地文件路径转换为可用的 file:// URL
-function avatarPathToUrl(avatarPath: string): string {
-  return `file:///${avatarPath.replace(/\\/g, '/').replace(/^\//, '')}`
+const fetchCache = new Map<string, Promise<{ intimacy: number | null; tags: Tag[]; totalTags: number }>>()
+const avatarCache = new Map<string, string | null>()
+
+function getCachedPersonData(personId: string): Promise<{ intimacy: number | null; tags: Tag[]; totalTags: number }> {
+  const existing = fetchCache.get(personId)
+  if (existing) return existing
+  const promise = (async () => {
+    const [intimacyRes, tagsRes] = await Promise.all([
+      window.electronAPI.ai.calculateIntimacy(personId),
+      window.electronAPI.tag.listByTarget(personId, 'person'),
+    ])
+    return {
+      intimacy: intimacyRes.success ? intimacyRes.data.total : null,
+      tags: tagsRes.success ? tagsRes.data.slice(0, 4) : [],
+      totalTags: tagsRes.success ? tagsRes.data.length : 0,
+    }
+  })()
+  fetchCache.set(personId, promise)
+  promise.then(() => setTimeout(() => fetchCache.delete(personId), 30000))
+  return promise
 }
 
 interface PersonCardProps {
@@ -44,30 +61,32 @@ const PersonCard = memo(function PersonCard({ person, onClick, onToggleFavorite 
   useEffect(() => {
     let cancelled = false
     const timer = setTimeout(async () => {
-      const loadExtra = async () => {
-        try {
-          const [intimacyRes, tagsRes] = await Promise.all([
-            window.electronAPI.ai.calculateIntimacy(person.id),
-            window.electronAPI.tag.listByTarget(person.id, 'person'),
-          ])
-          if (cancelled) return
-          if (intimacyRes.success) {
-            setIntimacy(intimacyRes.data.total)
-          }
-          if (tagsRes.success) {
-            setTotalTagCount(tagsRes.data.length)
-            setTags(tagsRes.data.slice(0, 4))
-          }
-        } catch {
-          // silent
-        }
-      }
-      await loadExtra()
+      const data = await getCachedPersonData(person.id)
+      if (cancelled) return
+      setIntimacy(data.intimacy)
+      setTags(data.tags)
+      setTotalTagCount(data.totalTags)
     }, 200)
     return () => {
       cancelled = true
       clearTimeout(timer)
     }
+  }, [person.id])
+
+  const [avatarDataUrl, setAvatarDataUrl] = useState<string | null>(null)
+  useEffect(() => {
+    let cancelled = false
+    if (avatarCache.has(person.id)) {
+      setAvatarDataUrl(avatarCache.get(person.id) ?? null)
+      return
+    }
+    window.electronAPI.person.getAvatarDataUrl(person.id).then(r => {
+      if (cancelled) return
+      const url = r.success ? r.data : null
+      avatarCache.set(person.id, url)
+      setAvatarDataUrl(url)
+    })
+    return () => { cancelled = true }
   }, [person.id])
 
   // 头像路径变化时重置错误状态（如上传新头像后）
@@ -92,9 +111,9 @@ const PersonCard = memo(function PersonCard({ person, onClick, onToggleFavorite 
       <div className="flex items-start gap-3">
         {/* 头像：有图片则显示，加载失败或无图片时回退到首字母占位 */}
         <div className="w-12 h-12 rounded-full bg-primary-500 flex items-center justify-center text-white text-lg font-bold flex-shrink-0 overflow-hidden">
-          {person.avatar_path && !avatarError ? (
+          {avatarDataUrl && !avatarError ? (
             <img
-              src={avatarPathToUrl(person.avatar_path)}
+              src={avatarDataUrl}
               alt={person.name}
               className="w-full h-full object-cover"
               onError={() => setAvatarError(true)}

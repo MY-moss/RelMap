@@ -27,12 +27,11 @@ export function createTag(data: { name: string; color?: string; parent_id?: stri
     }
     return { success: true, data: tag }
   } catch (e) {
-    const msg = (e as Error).message
-    // name 唯一约束冲突时给出更友好的提示
-    if (msg.includes('UNIQUE') || msg.includes('unique')) {
+    const err = e as Error & { code?: string }
+    if (err.code === 'SQLITE_CONSTRAINT_UNIQUE' || err.code === 'SQLITE_CONSTRAINT' || /UNIQUE|unique/.test(err.message)) {
       return { success: false, error: `标签名已存在: ${data.name}` }
     }
-    return { success: false, error: msg }
+    return { success: false, error: err.message }
   }
 }
 
@@ -59,6 +58,18 @@ export function updateTag(
       params.push(data.color)
     }
     if (data.parent_id !== undefined) {
+      if (data.parent_id === id) {
+        return { success: false, error: '标签不能将自己设为自己的父标签' }
+      }
+      // 检测循环引用：沿着 parent_id 链检查是否回到当前标签
+      let current = data.parent_id
+      while (current) {
+        if (current === id) {
+          return { success: false, error: '标签设置父标签会导致循环引用' }
+        }
+        const parent = db.prepare('SELECT parent_id FROM tags WHERE id = ?').get(current) as { parent_id: string | null } | undefined
+        current = parent?.parent_id ?? null
+      }
       fields.push('parent_id = ?')
       params.push(data.parent_id)
     }
@@ -76,11 +87,11 @@ export function updateTag(
     }
     return { success: true, data: updated }
   } catch (e) {
-    const msg = (e as Error).message
-    if (msg.includes('UNIQUE') || msg.includes('unique')) {
-      return { success: false, error: `标签名已存在` }
+    const err = e as Error & { code?: string }
+    if (err.code === 'SQLITE_CONSTRAINT_UNIQUE' || err.code === 'SQLITE_CONSTRAINT' || /UNIQUE|unique/.test(err.message)) {
+      return { success: false, error: '标签名已存在' }
     }
-    return { success: false, error: msg }
+    return { success: false, error: err.message }
   }
 }
 

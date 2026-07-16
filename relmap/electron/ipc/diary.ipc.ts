@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron'
+import { logIpcError } from '../logger'
 import { createDiary, updateDiary, deleteDiary, listDiaries } from '../../src/main/db/repositories/diaries.repo'
 import type { Result, Diary, CreateDiaryDto, UpdateDiaryDto, DiaryFilter } from '../../src/shared/types'
 

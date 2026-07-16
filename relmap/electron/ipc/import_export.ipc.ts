@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron'
+﻿import { ipcMain } from 'electron'
 import fs from 'node:fs'
 import {
   importVCard,
@@ -7,11 +7,12 @@ import {
   exportAllDataJSON,
 } from '../../src/main/db/repositories/import_export.repo'
 import type { Result } from '../../src/shared/types'
+import { logIpcError } from '../logger'
 import { showOpenDialogHelper, showSaveDialogHelper } from './dialog-helper'
 
-// 导入导出 IPC 通道注册
+// 瀵煎叆瀵煎嚭 IPC 閫氶亾娉ㄥ唽
 export function registerImportExportIPC(): void {
-  // 导入 vCard 文本
+  // 瀵煎叆 vCard 鏂囨湰
   ipcMain.handle('io:importVCard', async (_event, vcardText: string): Promise<Result<{ imported: number; skipped: number; errors: string[] }>> => {
     try {
       return importVCard(vcardText)
@@ -21,20 +22,20 @@ export function registerImportExportIPC(): void {
     }
   })
 
-  // 打开文件选择对话框，读取 vCard 文件并导入
+  // 鎵撳紑鏂囦欢閫夋嫨瀵硅瘽妗嗭紝璇诲彇 vCard 鏂囦欢骞跺鍏?
   ipcMain.handle('io:importVCardFile', async (): Promise<Result<{ imported: number; skipped: number; errors: string[] }>> => {
     try {
       const result = await showOpenDialogHelper({
-        title: '选择 vCard 文件',
+        title: '閫夋嫨 vCard 鏂囦欢',
         filters: [
-          { name: 'vCard 文件', extensions: ['vcf', 'vcard'] },
+          { name: 'vCard 鏂囦欢', extensions: ['vcf', 'vcard'] },
           { name: '所有文件', extensions: ['*'] },
         ],
         properties: ['openFile'],
       })
 
       if (result.canceled || result.filePaths.length === 0) {
-        return { success: false, error: '用户取消选择' }
+        return { success: false, error: '鐢ㄦ埛鍙栨秷閫夋嫨' }
       }
 
       const filePath = result.filePaths[0]
@@ -46,20 +47,20 @@ export function registerImportExportIPC(): void {
     }
   })
 
-  // 导出 CSV，使用 dialog.showSaveDialog 选择保存路径
+  // 瀵煎嚭 CSV锛屼娇鐢?dialog.showSaveDialog 閫夋嫨淇濆瓨璺緞
   ipcMain.handle('io:exportCSV', async (): Promise<Result<string>> => {
     try {
       const exportResult = exportContactsCSV()
       if (!exportResult.success) return exportResult
 
       const result = await showSaveDialogHelper({
-        title: '导出 CSV',
+        title: '瀵煎嚭 CSV',
         defaultPath: `contacts_${new Date().toISOString().slice(0, 10)}.csv`,
-        filters: [{ name: 'CSV 文件', extensions: ['csv'] }],
+        filters: [{ name: 'CSV 鏂囦欢', extensions: ['csv'] }],
       })
 
       if (result.canceled || !result.filePath) {
-        return { success: false, error: '用户取消保存' }
+        return { success: false, error: '鐢ㄦ埛鍙栨秷淇濆瓨' }
       }
 
       await fs.promises.writeFile(result.filePath, exportResult.data, 'utf-8')
@@ -70,7 +71,7 @@ export function registerImportExportIPC(): void {
     }
   })
 
-  // 导出 JSON：mode='contacts' 仅联系人，mode='all' 全部数据
+  // 瀵煎嚭 JSON锛歮ode='contacts' 浠呰仈绯讳汉锛宮ode='all' 鍏ㄩ儴鏁版嵁
   ipcMain.handle(
     'io:exportJSON',
     async (_event, mode: 'contacts' | 'all'): Promise<Result<string>> => {
@@ -84,13 +85,13 @@ export function registerImportExportIPC(): void {
             ? `contacts_${new Date().toISOString().slice(0, 10)}.json`
             : `relmap_backup_${new Date().toISOString().slice(0, 10)}.json`
         const result = await showSaveDialogHelper({
-          title: mode === 'contacts' ? '导出联系人 JSON' : '导出全部数据 JSON',
+          title: mode === 'contacts' ? '瀵煎嚭鑱旂郴浜?JSON' : '瀵煎嚭鍏ㄩ儴鏁版嵁 JSON',
           defaultPath: defaultName,
-          filters: [{ name: 'JSON 文件', extensions: ['json'] }],
+          filters: [{ name: 'JSON 鏂囦欢', extensions: ['json'] }],
         })
 
         if (result.canceled || !result.filePath) {
-          return { success: false, error: '用户取消保存' }
+          return { success: false, error: '鐢ㄦ埛鍙栨秷淇濆瓨' }
         }
 
         await fs.promises.writeFile(result.filePath, exportResult.data, 'utf-8')

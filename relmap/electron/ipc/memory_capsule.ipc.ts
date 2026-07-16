@@ -1,4 +1,6 @@
 import { ipcMain } from 'electron'
+
+import { logIpcError } from '../logger'
 import { getTodayMemories, getRandomMemory } from '../../src/main/db/repositories/memory_capsule.repo'
 import type { Result } from '../../src/shared/types'
 import type { MemoryCapsuleItem } from '../../src/main/db/repositories/memory_capsule.repo'

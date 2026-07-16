@@ -699,10 +699,14 @@ function SocialTabContent({ personId, onDelete, onEdit }: { personId: string; on
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let cancelled = false
+    setLoading(true)
     window.electronAPI.social.listByPerson(personId).then((result) => {
+      if (cancelled) return
       if (result.success) setSocials(result.data)
       setLoading(false)
     })
+    return () => { cancelled = true }
   }, [personId])
 
   if (loading) return <p className="text-gray-500 text-sm py-8 text-center">{t('common.loading')}</p>

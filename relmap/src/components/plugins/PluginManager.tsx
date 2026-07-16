@@ -132,9 +132,16 @@ export default function PluginManager() {
   const togglePlugin = useCallback(async (name: string, currentEnabled: boolean) => {
     const result = await window.electronAPI.plugin.setEnabled(name, !currentEnabled)
     if (result.success) {
-      setPlugins((prev) =>
-        prev.map((p) => (p.name === name ? { ...p, enabled: !currentEnabled, status: !currentEnabled ? 'enabled' : 'disabled' } : p))
-      )
+      const statusResult = await window.electronAPI.plugin.getStatus(name)
+      if (statusResult.success && statusResult.data) {
+        setPlugins((prev) =>
+          prev.map((p) => (p.name === name ? { ...p, enabled: statusResult.data!.enabled, status: statusResult.data!.status } : p))
+        )
+      } else {
+        setPlugins((prev) =>
+          prev.map((p) => (p.name === name ? { ...p, enabled: !currentEnabled } : p))
+        )
+      }
     } else {
       setError(result.error)
     }

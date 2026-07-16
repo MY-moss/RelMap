@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron'
+import { logIpcError } from '../logger'
 import { buildPersonalityProfile } from '../../src/main/ai/personality_profile'
 import type { PersonalityProfile } from '../../src/shared/types'
 import type { Result } from '../../src/shared/types'

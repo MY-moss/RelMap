@@ -154,6 +154,24 @@ export function exportBackup(
 
     const size = fs.statSync(outputPath).size
 
+    // 备份轮转：最多保留 20 个历史备份
+    rotateBackups(20)
+
+    // 验证备份文件完整性
+    if (password) {
+      try {
+        const verifyContent = fs.readFileSync(outputPath, 'utf8')
+        decryptData(verifyContent, password)
+      } catch {
+        return { success: false, error: '备份文件写入后验证失败：加密数据无法正确解密' }
+      }
+    } else {
+      const raw = fs.readFileSync(outputPath)
+      if (!isValidSqlite(raw)) {
+        return { success: false, error: '备份文件写入后验证失败：不是有效的 SQLite 数据库' }
+      }
+    }
+
     return {
       success: true,
       data: { path: outputPath, size, timestamp }
@@ -324,5 +342,27 @@ export function listBackups(): Result<BackupInfo[]> {
     return { success: true, data: backups }
   } catch (e) {
     return { success: false, error: (e as Error).message }
+  }
+}
+
+const MAX_BACKUPS = 20
+
+export function rotateBackups(maxCount: number = MAX_BACKUPS): void {
+  try {
+    const backupsDir = getBackupsDir()
+    if (!fs.existsSync(backupsDir)) return
+
+    const files = fs.readdirSync(backupsDir)
+      .filter(f => f.endsWith('.db') || f.endsWith('.db.enc'))
+      .map(f => ({ name: f, path: path.join(backupsDir, f), mtime: fs.statSync(path.join(backupsDir, f)).mtimeMs }))
+      .sort((a, b) => b.mtime - a.mtime)
+
+    if (files.length <= maxCount) return
+
+    for (let i = maxCount; i < files.length; i++) {
+      try { fs.unlinkSync(files[i].path) } catch { /* skip locked files */ }
+    }
+  } catch {
+    // rotation failures are non-fatal
   }
 }

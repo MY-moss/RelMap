@@ -22,7 +22,9 @@ async function getOcrWorker(): Promise<TesseractWorker> {
     // v7 简化 API：createWorker 传入语言参数即可自动加载语言包并初始化
     // 无需单独调用 loadLanguage 和 initialize
     workerPromise = (async () => {
-      const worker = await createWorker('chi_sim+eng')
+      // Windows 下使用空格分隔避免 ANSI 编码损坏（chi_sim+eng → 锟斤拷）
+      const lang = process.platform === 'win32' ? 'chi_sim eng' : 'chi_sim+eng'
+      const worker = await createWorker(lang)
       await worker.setParameters({
         tessedit_pageseg_mode: PSM.AUTO,
       })

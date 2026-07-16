@@ -93,23 +93,20 @@
   "build": {
     "appId": "com.relmap.app",
     "productName": "RelMap",
-    "publish": {
-      "provider": "github",
-      "owner": "your-github-username",
-      "repo": "relmap"
-    },
     "win": {
-      "target": ["nsis"],
-      "publish": ["github"]
+      "target": ["nsis"]
     },
     "mac": {
-      "target": ["dmg"],
-      "publish": ["github"]
+      "target": ["dmg"]
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MY-moss/RelMap.git"
   },
   "main": "dist-electron/main.mjs",
   "optionalDependencies": {

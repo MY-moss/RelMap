@@ -120,7 +120,7 @@ app.whenReady().then(async () => {
     }
     logger.info('[DB] 数据库初始化完成')
   } catch (err) {
-    logger.error('[DB] 数据库初始化失败:', (err as Error).message)
+    logger.error({ err }, '[DB] 数据库初始化失败')
     Sentry.captureException(err)
     dialog.showErrorBox(
         'RelMap 启动失败',

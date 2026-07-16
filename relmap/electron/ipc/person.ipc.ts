@@ -1,4 +1,5 @@
 import { ipcMain, app } from 'electron'
+import { logIpcError } from '../logger'
 import path from 'node:path'
 import fs from 'node:fs'
 import type {
@@ -35,7 +36,7 @@ export function registerPersonIPC(): void {
           title: `${result.data.name} 的生日`,
           remind_date: data.birthday,
           repeat_type: 'yearly',
-          note: `自动为${result.data.name}创建的生日提醒`,
+          note: `自动�?{result.data.name}创建的生日提醒`,
         })
         if (!reminderResult.success) {
           logIpcError('person:create', reminderResult.error, '生日提醒创建失败')
@@ -63,7 +64,7 @@ export function registerPersonIPC(): void {
           title: `${result.data.name} 的生日`,
           remind_date: data.birthday,
           repeat_type: 'yearly',
-          note: `自动为${result.data.name}创建的生日提醒`,
+          note: `自动�?{result.data.name}创建的生日提醒`,
         })
         if (!reminderResult.success) {
           logIpcError('person:update', reminderResult.error, '生日提醒创建失败')
@@ -135,6 +136,21 @@ export function registerPersonIPC(): void {
       return { success: true, data: avatarPath }
     } catch (e) {
       logIpcError('person:uploadAvatar', e)
+      return { success: false, error: (e as Error).message }
+    }
+  })
+
+  ipcMain.handle('person:getAvatarDataUrl', async (_event, personId: string): Promise<Result<string | null>> => {
+    try {
+      const avatarsDir = path.join(app.getPath('userData'), 'avatars')
+      const avatarPath = path.join(avatarsDir, `${personId}.jpg`)
+      if (!fs.existsSync(avatarPath)) return { success: true, data: null }
+      const buffer = await fs.promises.readFile(avatarPath)
+      const ext = path.extname(avatarPath).toLowerCase().replace('.', '')
+      const mime = ext === 'png' ? 'image/png' : ext === 'gif' ? 'image/gif' : 'image/jpeg'
+      return { success: true, data: `data:${mime};base64,${buffer.toString('base64')}` }
+    } catch (e) {
+      logIpcError('person:getAvatarDataUrl', e)
       return { success: false, error: (e as Error).message }
     }
   })

@@ -12,6 +12,7 @@ import {
 } from '../../src/main/db/backup'
 import type { Result } from '../../src/shared/types'
 import { showSaveDialogHelper, showOpenDialogHelper } from './dialog-helper'
+import { logIpcError } from '../logger'
 
 export function registerBackupIPC(): void {
   // ========== 导出备份 ==========
@@ -88,7 +89,7 @@ export function registerBackupIPC(): void {
     try {
       return listBackups()
     } catch (error) {
-      logIpcError('backup:list', e)
+      logIpcError('backup:list', error)
       return { success: false, error: (error as Error).message }
     }
   })

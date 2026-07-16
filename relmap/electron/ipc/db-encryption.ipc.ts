@@ -1,5 +1,6 @@
-import { ipcMain } from 'electron'
+﻿import { ipcMain } from 'electron'
 import type { Result } from '../../src/shared/types'
+import { logIpcError } from '../logger'
 import {
   isDbEncrypted,
   encryptDb,
@@ -9,6 +10,7 @@ import {
   getEncryptionKey,
   setEncryptionKey,
 } from '../../src/main/db/connection'
+
 function checkPasswordStrength(password: string): { score: number; label: string; feedback: string } {
   let score = 0
 

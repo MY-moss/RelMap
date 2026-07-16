@@ -1,5 +1,6 @@
-import { ipcMain } from 'electron'
+﻿import { ipcMain } from 'electron'
 import type { Result, DiaryAnalysis } from '../../src/shared/types'
+import { logIpcError } from '../logger'
 import {
   extractKeywords,
   analyzeEmotion,
@@ -9,7 +10,7 @@ export function registerDiaryAnalysisIPC(): void {
   ipcMain.handle('diary:analyze', async (_event, content: string): Promise<Result<DiaryAnalysis>> => {
     try {
       if (typeof content !== 'string' || content.length === 0) {
-        return { success: false, error: '日记内容不能为空' }
+        return { success: false, error: '鏃ヨ鍐呭涓嶈兘涓虹┖' }
       }
       if (content.length > 100000) {
         return { success: false, error: '日记内容过长（超过100000字符）' }

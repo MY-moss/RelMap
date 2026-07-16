@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron'
+import { logIpcError } from '../logger'
 import { searchGlobal, semanticSearch } from '../../src/main/db/repositories/search.repo'
 import type { Result, SearchResults, SemanticSearchResults } from '../../src/shared/types'
 
