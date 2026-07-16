@@ -1,0 +1,13 @@
+{
+  "name": "google-contacts",
+  "version": "1.0.0",
+  "description": "Google 通讯录同步 — 从 Google Contacts 导入联系人，支持增量同步和头像下载",
+  "author": "RelMap Team",
+  "main": "index.js",
+  "hooks": ["app:ready", "person:created", "person:updated"],
+  "permissions": ["network", "db:read", "db:write", "notification"],
+  "actions": ["sync", "syncStatus", "importAll"],
+  "ui": {
+    "slots": ["settings:plugin"]
+  }
+}

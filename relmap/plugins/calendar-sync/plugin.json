@@ -1,0 +1,13 @@
+{
+  "name": "calendar-sync",
+  "version": "1.0.0",
+  "description": "日历双向同步 — 将 Google Calendar / Outlook 事件同步为 RelMap 社交事件，追踪与联系人的互动",
+  "author": "RelMap Team",
+  "main": "index.js",
+  "hooks": ["app:ready", "event:created"],
+  "permissions": ["network", "db:read", "db:write", "notification"],
+  "actions": ["sync", "syncStatus", "selectCalendars"],
+  "ui": {
+    "slots": ["settings:plugin"]
+  }
+}

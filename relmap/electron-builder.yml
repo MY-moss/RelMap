@@ -1,0 +1,36 @@
+appId: com.relmap.app
+productName: RelMap
+copyright: Copyright © 2026 RelMap
+
+directories:
+  output: release
+  buildResources: public
+
+files:
+  - dist/**/*
+  - dist-electron/**/*
+  - "!**/node_modules/*/{CHANGELOG.md,README.md,readme.md,readme}"
+  - "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}"
+  - "!**/*.{md,markdown}"
+  - "!**/.{idea,git,cache,vscode,DS_Store}"
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  sign: false
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  allowElevation: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: RelMap
+  deleteAppDataOnUninstall: false
+
+npmRebuild: true
+nodeGypRebuild: true
+buildDependenciesFromSource: true

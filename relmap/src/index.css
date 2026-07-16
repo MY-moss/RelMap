@@ -1,0 +1,1161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   设计标记 (Design Tokens)
+   ============================================================ */
+:root,
+[data-theme="orange"] {
+  --primary-50: #FFF3E0;
+  --primary-100: #FFE0B2;
+  --primary-200: #FFCC80;
+  --primary-300: #FFB74D;
+  --primary-400: #FFA726;
+  --primary-500: #FF9F43;
+  --primary-600: #FB8C00;
+  --primary-700: #F57C00;
+  --primary-800: #EF6C00;
+  --primary-900: #E65100;
+  --glow: rgba(255,159,67,0.15);
+  --glow-sm: rgba(255,159,67,0.1);
+
+  font-family: Inter, PingFang SC, Microsoft YaHei, system-ui, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Surface colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f6f8;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --surface: #ffffff;
+  --surface-muted: #f1f4f9;
+  --surface-alt: #eef1f6;
+  --surface-border: #e2e6ed;
+  /* Glass originals */
+  --bg-primary-orig: #ffffff;
+  --bg-secondary-orig: #f5f6f8;
+  --surface-orig: #ffffff;
+  --surface-muted-orig: #f1f4f9;
+  --surface-alt-orig: #eef1f6;
+  --surface-border-orig: #e2e6ed;
+
+  /* Refined shadows */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+  --shadow-card-hover: 0 8px 25px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.03);
+  --shadow-elevated: 0 12px 40px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.04);
+  --shadow-modal: 0 20px 60px rgba(0,0,0,0.1), 0 8px 20px rgba(0,0,0,0.06);
+
+  --graph-container-height: calc(100vh - 200px);
+  --color-intimacy-distant: #d1d5db;
+  --color-intimacy-normal: #60a5fa;
+  --color-intimacy-friend: #34d399;
+  --color-intimacy-close: #fb923c;
+  --color-intimacy-intimate: #f87171;
+  --color-lifecycle-new: #60a5fa;
+  --color-lifecycle-active: #34d399;
+  --color-lifecycle-maintain: #fbbf24;
+  --color-lifecycle-dormant: #fb923c;
+  --color-lifecycle-lost: #f87171;
+  --color-lifecycle-archived: #9ca3af;
+  --sidebar-width: 64px;
+}
+
+/* ============================================================
+   主题：翡翠绿 (Emerald)
+   ============================================================ */
+[data-theme="emerald"] {
+  --primary-50: #ECFDF5;
+  --primary-100: #D1FAE5;
+  --primary-200: #A7F3D0;
+  --primary-300: #6EE7B7;
+  --primary-400: #34D399;
+  --primary-500: #10B981;
+  --primary-600: #059669;
+  --primary-700: #047857;
+  --primary-800: #065F46;
+  --primary-900: #064E3B;
+  --glow: rgba(16,185,129,0.15);
+  --glow-sm: rgba(16,185,129,0.1);
+}
+
+/* ============================================================
+   主题：紫罗兰 (Violet)
+   ============================================================ */
+[data-theme="violet"] {
+  --primary-50: #F5F3FF;
+  --primary-100: #EDE9FE;
+  --primary-200: #DDD6FE;
+  --primary-300: #C4B5FD;
+  --primary-400: #A78BFA;
+  --primary-500: #8B5CF6;
+  --primary-600: #7C3AED;
+  --primary-700: #6D28D9;
+  --primary-800: #5B21B6;
+  --primary-900: #4C1D95;
+  --glow: rgba(139,92,246,0.15);
+  --glow-sm: rgba(139,92,246,0.1);
+}
+
+/* ============================================================
+   主题：玫瑰红 (Rose)
+   ============================================================ */
+[data-theme="rose"] {
+  --primary-50: #FFF1F2;
+  --primary-100: #FFE4E6;
+  --primary-200: #FECDD3;
+  --primary-300: #FDA4AF;
+  --primary-400: #FB7185;
+  --primary-500: #F43F5E;
+  --primary-600: #E11D48;
+  --primary-700: #BE123C;
+  --primary-800: #9F1239;
+  --primary-900: #881337;
+  --glow: rgba(244,63,94,0.15);
+  --glow-sm: rgba(244,63,94,0.1);
+}
+
+/* ============================================================
+   主题：天空蓝 (Sky)
+   ============================================================ */
+[data-theme="sky"] {
+  --primary-50: #F0F9FF;
+  --primary-100: #E0F2FE;
+  --primary-200: #BAE6FD;
+  --primary-300: #7DD3FC;
+  --primary-400: #38BDF8;
+  --primary-500: #0EA5E9;
+  --primary-600: #0284C7;
+  --primary-700: #0369A1;
+  --primary-800: #075985;
+  --primary-900: #0C4A6E;
+  --glow: rgba(14,165,233,0.15);
+  --glow-sm: rgba(14,165,233,0.1);
+}
+
+/* ============================================================
+   主题：琥珀金 (Amber)
+   ============================================================ */
+[data-theme="amber"] {
+  --primary-50: #FFFBEB;
+  --primary-100: #FEF3C7;
+  --primary-200: #FDE68A;
+  --primary-300: #FCD34D;
+  --primary-400: #FBBF24;
+  --primary-500: #F59E0B;
+  --primary-600: #D97706;
+  --primary-700: #B45309;
+  --primary-800: #92400E;
+  --primary-900: #78350F;
+  --glow: rgba(245,158,11,0.15);
+  --glow-sm: rgba(245,158,11,0.1);
+}
+
+/* ============================================================
+   暗色模式覆写
+   ============================================================ */
+.dark {
+  --bg-primary: #1f2937;
+  --bg-secondary: #111827;
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --surface: #1f2937;
+  --surface-muted: #374151;
+  --surface-alt: #1e293b;
+  --surface-border: #374151;
+  /* Store originals for glass mode restoration */
+  --bg-primary-orig: #1f2937;
+  --bg-secondary-orig: #111827;
+  --surface-orig: #1f2937;
+  --surface-muted-orig: #374151;
+  --surface-alt-orig: #1e293b;
+  --surface-border-orig: #374151;
+}
+
+/* ============================================================
+   磨砂玻璃 / 半透明模式
+   ============================================================
+   Strategy: Override CSS surface variables + Tailwind bg
+   classes via high-specificity selectors.
+   ============================================================ */
+
+/* --- Shared: override CSS variables so var(--surface) adapts --- */
+html.glass-frosted,
+html.glass-translucent {
+  --glass-blur: 16px;
+  --surface: color-mix(in srgb, var(--surface-orig) 50%, transparent);
+  --surface-muted: color-mix(in srgb, var(--surface-muted-orig) 45%, transparent);
+  --surface-alt: color-mix(in srgb, var(--surface-alt-orig) 40%, transparent);
+  --surface-border: color-mix(in srgb, var(--surface-border-orig) 35%, transparent);
+  --bg-primary: color-mix(in srgb, var(--bg-primary-orig) 55%, transparent);
+}
+
+/* --- Frosted --- */
+html.glass-frosted {
+  --glass-surface: color-mix(in srgb, var(--surface-orig) 50%, transparent);
+  --glass-surface-muted: color-mix(in srgb, var(--surface-muted-orig) 45%, transparent);
+  --glass-border: color-mix(in srgb, var(--surface-border-orig) 35%, transparent);
+  --glass-hover: rgba(255,255,255,0.08);
+}
+
+/* --- Translucent --- */
+html.glass-translucent {
+  --glass-surface: color-mix(in srgb, var(--surface-orig) 22%, transparent);
+  --glass-surface-muted: color-mix(in srgb, var(--surface-muted-orig) 18%, transparent);
+  --glass-border: color-mix(in srgb, var(--surface-border-orig) 20%, transparent);
+  --glass-blur: 24px;
+  --glass-hover: rgba(255,255,255,0.03);
+}
+
+/* --- Dark + glass (classes coexist on <html>) --- */
+html.dark.glass-frosted {
+  --glass-surface: color-mix(in srgb, var(--surface-orig) 40%, transparent);
+  --glass-surface-muted: color-mix(in srgb, var(--surface-muted-orig) 35%, transparent);
+  --glass-border: color-mix(in srgb, var(--surface-border-orig) 30%, transparent);
+  --glass-hover: rgba(255,255,255,0.04);
+}
+
+html.dark.glass-translucent {
+  --glass-surface: color-mix(in srgb, var(--surface-orig) 18%, transparent);
+  --glass-surface-muted: color-mix(in srgb, var(--surface-muted-orig) 14%, transparent);
+  --glass-border: color-mix(in srgb, var(--surface-border-orig) 15%, transparent);
+  --glass-hover: rgba(255,255,255,0.02);
+  --glass-blur: 28px;
+}
+
+/* --- Body background in glass mode (the "wall" behind glass) --- */
+html.glass-frosted .app-bg,
+html.glass-translucent .app-bg {
+  background-color: var(--bg-secondary-orig);
+  background-image:
+    radial-gradient(ellipse at 20% 50%, color-mix(in srgb, var(--primary-300) 20%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--primary-200) 12%, transparent) 0%, transparent 50%),
+    repeating-linear-gradient(0deg, transparent, transparent 1px, color-mix(in srgb, var(--primary-200) 4%, transparent) 1px, color-mix(in srgb, var(--primary-200) 4%, transparent) 2px);
+}
+
+html.dark.glass-frosted .app-bg,
+html.dark.glass-translucent .app-bg {
+  background-image:
+    radial-gradient(ellipse at 20% 50%, color-mix(in srgb, var(--primary-600) 15%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, color-mix(in srgb, var(--primary-700) 8%, transparent) 0%, transparent 50%),
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.015) 1px, rgba(255,255,255,0.015) 2px);
+}
+
+/* ====== SURFACE ELEMENTS: glass background + backdrop-filter ====== */
+
+/* Smooth transition when toggling glass mode */
+html.glass-frosted .card,
+html.glass-frosted .sidebar-glass,
+html.glass-frosted .search-bar-glass,
+html.glass-frosted .card-header,
+html.glass-frosted .card-body,
+html.glass-frosted .wrapped-chart-card,
+html.glass-frosted .wrapped-stat-card,
+html.glass-frosted .chat-container-warm,
+html.glass-frosted .zoom-controls,
+html.glass-frosted .nav-item,
+html.glass-frosted .msg-warm-assistant,
+html.glass-translucent .card,
+html.glass-translucent .sidebar-glass,
+html.glass-translucent .search-bar-glass,
+html.glass-translucent .card-header,
+html.glass-translucent .card-body,
+html.glass-translucent .wrapped-chart-card,
+html.glass-translucent .wrapped-stat-card,
+html.glass-translucent .chat-container-warm,
+html.glass-translucent .zoom-controls,
+html.glass-translucent .nav-item,
+html.glass-translucent .msg-warm-assistant {
+  transition: background 0.35s ease, border-color 0.35s ease, backdrop-filter 0.35s ease;
+}
+
+/* Main surface override: named classes + Tailwind bg-* utilities */
+html.glass-frosted .card,
+html.glass-frosted .sidebar-glass,
+html.glass-frosted .search-bar-glass,
+html.glass-frosted .card-header,
+html.glass-frosted .card-body,
+html.glass-frosted .wrapped-chart-card,
+html.glass-frosted .wrapped-stat-card,
+html.glass-frosted .chat-container-warm,
+html.glass-frosted .zoom-controls,
+html.glass-frosted .bg-white,
+html.glass-frosted [class*="bg-white/"],
+html.glass-frosted .bg-gray-50,
+html.glass-frosted .bg-gray-100,
+html.glass-frosted .bg-gray-200,
+html.glass-frosted [class*="dark:bg-gray-"],
+html.glass-translucent .card,
+html.glass-translucent .sidebar-glass,
+html.glass-translucent .search-bar-glass,
+html.glass-translucent .card-header,
+html.glass-translucent .card-body,
+html.glass-translucent .wrapped-chart-card,
+html.glass-translucent .wrapped-stat-card,
+html.glass-translucent .chat-container-warm,
+html.glass-translucent .zoom-controls,
+html.glass-translucent .bg-white,
+html.glass-translucent [class*="bg-white/"],
+html.glass-translucent .bg-gray-50,
+html.glass-translucent .bg-gray-100,
+html.glass-translucent .bg-gray-200,
+html.glass-translucent [class*="dark:bg-gray-"] {
+  background: var(--glass-surface) !important;
+  backdrop-filter: blur(var(--glass-blur)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+  border-color: var(--glass-border) !important;
+}
+
+/* Muted surface: cards with lower emphasis */
+html.glass-frosted .bg-gray-100,
+html.glass-frosted .bg-gray-200,
+html.glass-frosted .msg-warm-assistant,
+html.glass-translucent .bg-gray-100,
+html.glass-translucent .bg-gray-200,
+html.glass-translucent .msg-warm-assistant {
+  background: var(--glass-surface-muted) !important;
+}
+
+/* Dark-muted surface */
+html.dark.glass-frosted .bg-gray-100,
+html.dark.glass-frosted .bg-gray-200,
+html.dark.glass-translucent .bg-gray-100,
+html.dark.glass-translucent .bg-gray-200 {
+  background: var(--glass-surface-muted) !important;
+}
+
+/* Hover states */
+html.glass-frosted .card:hover,
+html.glass-frosted .wrapped-chart-card:hover,
+html.glass-frosted .wrapped-stat-card:hover,
+html.glass-translucent .card:hover,
+html.glass-translucent .wrapped-chart-card:hover,
+html.glass-translucent .wrapped-stat-card:hover {
+  background: color-mix(in srgb, var(--glass-surface) 90%, var(--glass-hover)) !important;
+}
+
+/* Sidebar & search bar borders */
+html.glass-frosted .sidebar-glass,
+html.glass-translucent .sidebar-glass {
+  border-right-color: var(--glass-border) !important;
+}
+html.glass-frosted .search-bar-glass,
+html.glass-translucent .search-bar-glass {
+  border-bottom-color: var(--glass-border) !important;
+}
+
+/* Nav items */
+html.glass-frosted .nav-item:hover,
+html.glass-translucent .nav-item:hover {
+  background: color-mix(in srgb, var(--glass-surface) 80%, var(--glass-hover)) !important;
+}
+html.glass-frosted .nav-item.active,
+html.glass-translucent .nav-item.active {
+  background: color-mix(in srgb, var(--primary-500) 18%, var(--glass-surface)) !important;
+}
+
+/* Chat messages */
+html.glass-frosted .msg-warm-assistant,
+html.glass-translucent .msg-warm-assistant {
+  background: color-mix(in srgb, var(--primary-50) 35%, var(--glass-surface)) !important;
+  border-color: color-mix(in srgb, var(--primary-200) 18%, var(--glass-border)) !important;
+}
+html.dark.glass-frosted .msg-warm-assistant,
+html.dark.glass-translucent .msg-warm-assistant {
+  background: color-mix(in srgb, var(--primary-700) 10%, var(--glass-surface)) !important;
+}
+
+/* Dialog / modal overlays */
+html.glass-frosted [role="dialog"],
+html.glass-translucent [role="dialog"] {
+  backdrop-filter: blur(var(--glass-blur)) !important;
+}
+
+/* Inputs */
+html.glass-frosted input,
+html.glass-frosted select,
+html.glass-frosted textarea,
+html.glass-translucent input,
+html.glass-translucent select,
+html.glass-translucent textarea {
+  background: color-mix(in srgb, var(--glass-surface-muted) 60%, var(--glass-surface)) !important;
+  border-color: var(--glass-border) !important;
+}
+
+/* ============================================================
+   基础重置
+   ============================================================ */
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Subtle noise texture overlay */
+.app-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+.dark .app-bg::before {
+  opacity: 0.03;
+}
+
+/* ============================================================
+   背景纹理
+   ============================================================ */
+.app-bg {
+  background-color: var(--bg-secondary);
+  background-image:
+    radial-gradient(ellipse at 25% 45%, color-mix(in srgb, var(--primary-300) 10%, transparent) 0%, transparent 55%),
+    radial-gradient(ellipse at 75% 25%, color-mix(in srgb, var(--primary-200) 6%, transparent) 0%, transparent 45%);
+}
+
+.dark .app-bg {
+  background-image:
+    radial-gradient(ellipse at 25% 45%, color-mix(in srgb, var(--primary-600) 8%, transparent) 0%, transparent 55%),
+    radial-gradient(ellipse at 75% 25%, color-mix(in srgb, var(--primary-500) 4%, transparent) 0%, transparent 45%);
+}
+
+/* ============================================================
+   侧边栏
+   ============================================================ */
+.sidebar-glass {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid var(--surface-border);
+}
+
+.dark .sidebar-glass {
+  background: rgba(30, 41, 59, 0.85);
+  border-right: 1px solid rgba(55, 65, 81, 0.5);
+}
+
+/* ============================================================
+   导航项
+   ============================================================ */
+.nav-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 48px;
+  border-radius: 10px;
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  background: color-mix(in srgb, var(--primary-500) 7%, transparent);
+  color: var(--primary-600);
+}
+
+.nav-item.active {
+  background: color-mix(in srgb, var(--primary-500) 10%, transparent);
+  color: var(--primary-600);
+}
+
+.nav-item .nav-label {
+  font-size: 9px;
+  line-height: 1;
+  margin-top: 2px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.nav-item:hover .nav-label,
+.nav-item.active .nav-label {
+  opacity: 1;
+}
+
+.nav-item .nav-icon {
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-item:hover .nav-icon {
+  transform: scale(1.08);
+}
+
+.nav-item.active .nav-icon {
+  transform: scale(1.05);
+}
+
+/* ============================================================
+   头像（主身份）
+   ============================================================ */
+.avatar-ring {
+  position: relative;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-400), var(--primary-600));
+  padding: 2px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.avatar-ring:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 20px var(--glow);
+}
+
+.avatar-ring:active {
+  transform: scale(0.95);
+}
+
+.avatar-ring .avatar-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--primary-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--primary-600);
+  overflow: hidden;
+}
+
+.dark .avatar-ring .avatar-inner {
+  background: color-mix(in srgb, var(--primary-500) 15%, transparent);
+  color: var(--primary-300);
+}
+
+/* ============================================================
+   搜索栏
+   ============================================================ */
+.search-bar-glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.dark .search-bar-glass {
+  background: rgba(30, 41, 59, 0.85);
+  border-bottom: 1px solid rgba(55, 65, 81, 0.4);
+}
+
+/* ============================================================
+   通用卡片样式
+   ============================================================ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-card-hover);
+  border-color: color-mix(in srgb, var(--primary-300) 25%, var(--surface-border));
+}
+
+.card-header {
+  padding: 16px 20px 0;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.card-body {
+  padding: 16px 20px;
+}
+
+/* Elevated card variant (for modals, highlights) */
+.card-elevated {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-elevated);
+}
+
+/* ============================================================
+   页面过渡动画
+   ============================================================ */
+.page-enter {
+  animation: pageIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter-stagger > * {
+  opacity: 0;
+  animation: staggerIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.page-enter-stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.page-enter-stagger > *:nth-child(2) { animation-delay: 0.05s; }
+.page-enter-stagger > *:nth-child(3) { animation-delay: 0.08s; }
+.page-enter-stagger > *:nth-child(4) { animation-delay: 0.11s; }
+.page-enter-stagger > *:nth-child(5) { animation-delay: 0.14s; }
+.page-enter-stagger > *:nth-child(6) { animation-delay: 0.17s; }
+.page-enter-stagger > *:nth-child(7) { animation-delay: 0.20s; }
+.page-enter-stagger > *:nth-child(8) { animation-delay: 0.23s; }
+
+@keyframes staggerIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   主题选择器
+   ============================================================ */
+.theme-swatch {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 2px solid transparent;
+  overflow: hidden;
+}
+
+.theme-swatch:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.theme-swatch.active {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--primary-500);
+  transform: scale(1.1);
+}
+
+.theme-swatch::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.2) 50%);
+}
+
+.theme-swatch[data-theme="orange"] { background: linear-gradient(135deg, #FF9F43, #FB8C00); }
+.theme-swatch[data-theme="emerald"] { background: linear-gradient(135deg, #10B981, #059669); }
+.theme-swatch[data-theme="violet"] { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+.theme-swatch[data-theme="rose"] { background: linear-gradient(135deg, #F43F5E, #E11D48); }
+.theme-swatch[data-theme="sky"] { background: linear-gradient(135deg, #0EA5E9, #0284C7); }
+.theme-swatch[data-theme="amber"] { background: linear-gradient(135deg, #F59E0B, #D97706); }
+
+/* ============================================================
+   交互动画
+   ============================================================ */
+.enter-stagger > * {
+  opacity: 0;
+  animation: navEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.enter-stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.enter-stagger > *:nth-child(2) { animation-delay: 0.04s; }
+.enter-stagger > *:nth-child(3) { animation-delay: 0.06s; }
+.enter-stagger > *:nth-child(4) { animation-delay: 0.08s; }
+.enter-stagger > *:nth-child(5) { animation-delay: 0.10s; }
+.enter-stagger > *:nth-child(6) { animation-delay: 0.12s; }
+.enter-stagger > *:nth-child(7) { animation-delay: 0.14s; }
+.enter-stagger > *:nth-child(8) { animation-delay: 0.16s; }
+.enter-stagger > *:nth-child(9) { animation-delay: 0.18s; }
+.enter-stagger > *:nth-child(10) { animation-delay: 0.20s; }
+.enter-stagger > *:nth-child(11) { animation-delay: 0.22s; }
+
+@keyframes navEnter {
+  from {
+    opacity: 0;
+    transform: translateX(-12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* ============================================================
+   滚动条
+   ============================================================ */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+.dark ::-webkit-scrollbar-thumb { background: #475569; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+/* ============================================================
+   表单控件统一样式
+   ============================================================ */
+input, select, textarea {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary-500) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-500) 15%, transparent) !important;
+  outline: none;
+}
+
+/* ============================================================
+   按钮统一样式
+   ============================================================ */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: var(--primary-500);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  line-height: 1.4;
+}
+
+.btn-primary:hover {
+  background: var(--primary-600);
+  box-shadow: 0 4px 12px var(--glow);
+  transform: translateY(-0.5px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--surface-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1.4;
+}
+
+.btn-secondary:hover {
+  background: var(--surface-muted);
+  color: var(--text-primary);
+  border-color: color-mix(in srgb, var(--primary-300) 30%, var(--surface-border));
+}
+
+/* ============================================================
+   AI 聊天 — 温暖舒适的消息区域
+   ============================================================ */
+.chat-container-warm {
+  position: relative;
+  background:
+    radial-gradient(ellipse at 0% 40%, color-mix(in srgb, var(--primary-200) 20%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse at 100% 60%, color-mix(in srgb, var(--primary-100) 15%, transparent) 0%, transparent 50%),
+    var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--primary-300) 8%, transparent),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.dark .chat-container-warm {
+  background:
+    radial-gradient(ellipse at 0% 40%, color-mix(in srgb, var(--primary-700) 8%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse at 100% 60%, color-mix(in srgb, var(--primary-600) 6%, transparent) 0%, transparent 50%),
+    var(--surface);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary-400) 6%, transparent);
+}
+
+/* AI 消息气泡 — 温和左边界 */
+.msg-warm-assistant {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary-50) 60%, var(--surface)) 0%,
+    var(--surface-muted) 100%
+  ) !important;
+  border: 1px solid color-mix(in srgb, var(--primary-200) 30%, transparent);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  color: var(--text-primary) !important;
+}
+
+.msg-warm-assistant::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, var(--primary-400), var(--primary-300));
+  opacity: 0.5;
+}
+
+.dark .msg-warm-assistant {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary-700) 15%, var(--surface)) 0%,
+    var(--surface-muted) 100%
+  ) !important;
+  border-color: color-mix(in srgb, var(--primary-600) 20%, transparent);
+  color: var(--text-primary) !important;
+}
+
+.dark .msg-warm-assistant::before {
+  opacity: 0.6;
+}
+
+/* ============================================================
+   图谱 — 缩放控件
+   ============================================================ */
+.zoom-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  padding: 3px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.zoom-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 16px;
+  font-family: inherit;
+  line-height: 1;
+}
+
+.zoom-btn:hover {
+  background: color-mix(in srgb, var(--primary-500) 10%, transparent);
+  color: var(--primary-600);
+}
+
+.zoom-btn:active {
+  transform: scale(0.92);
+}
+
+.zoom-divider {
+  width: 20px;
+  height: 1px;
+  margin: 1px auto;
+  background: var(--surface-border);
+}
+
+/* ============================================================
+   联系人 — 标签胶囊
+   ============================================================ */
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1.5px solid transparent;
+  user-select: none;
+}
+
+.tag-chip:hover {
+  transform: translateY(-1px);
+}
+
+.tag-chip.active {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px currentColor;
+}
+
+.tag-chip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   年度报告 — 杂志风格
+   ============================================================ */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.wrapped-section {
+  opacity: 0;
+  animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+
+
+.wrapped-cover {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--primary-500) 12%, var(--bg-primary)) 0%,
+    color-mix(in srgb, var(--primary-300) 6%, var(--bg-primary)) 50%,
+    var(--bg-primary) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--primary-200) 20%, transparent);
+}
+
+.wrapped-cover::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--primary-400) 10%, transparent) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.wrapped-cover::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--primary-300) 8%, transparent) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.dark .wrapped-cover {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--primary-600) 10%, var(--bg-primary)) 0%,
+    color-mix(in srgb, var(--primary-700) 6%, var(--bg-primary)) 50%,
+    var(--bg-primary) 100%
+  );
+}
+
+.wrapped-cover-year {
+  font-size: clamp(4rem, 10vw, 7rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, var(--primary-400), var(--primary-600));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.wrapped-stat-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wrapped-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -8px rgba(0,0,0,0.08);
+  border-color: color-mix(in srgb, var(--primary-300) 40%, var(--surface-border));
+}
+
+.wrapped-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.wrapped-stat-label {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.wrapped-stat-icon {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.wrapped-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.wrapped-divider::before,
+.wrapped-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--surface-border), transparent);
+}
+
+.wrapped-milestone {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  padding: 24px;
+  isolation: isolate;
+}
+
+.wrapped-milestone::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.06;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 8px,
+    rgba(255,255,255,0.3) 8px,
+    rgba(255,255,255,0.3) 9px
+  );
+  pointer-events: none;
+}
+
+.wrapped-chart-card {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
+  padding: 24px;
+  transition: box-shadow 0.3s ease;
+}
+
+.wrapped-chart-card:hover {
+  box-shadow: 0 8px 24px -6px rgba(0,0,0,0.06);
+}
+
+.wrapped-chart-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dark .wrapped-stat-card:hover {
+  box-shadow: 0 12px 32px -8px rgba(0,0,0,0.3);
+  border-color: color-mix(in srgb, var(--primary-400) 30%, var(--surface-border));
+}
+
+/* ============================================================
+   TipTap / 富文本
+   ============================================================ */
+.rich-text-editor-wrapper :deep(.ProseMirror) {
+  outline: none;
+  min-height: 200px;
+}
+
+.rich-text-editor-wrapper :deep(.ProseMirror p.is-editor-empty:first-child::before) {
+  color: #9ca3af;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.rich-text-editor-wrapper :deep(.ProseMirror h1) { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+.rich-text-editor-wrapper :deep(.ProseMirror h2) { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+.rich-text-editor-wrapper :deep(.ProseMirror h3) { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; }
+.rich-text-editor-wrapper :deep(.ProseMirror p) { margin-bottom: 0.5rem; }
+.rich-text-editor-wrapper :deep(.ProseMirror ul),
+.rich-text-editor-wrapper :deep(.ProseMirror ol) { padding-left: 1.5rem; margin-bottom: 0.5rem; }
+.rich-text-editor-wrapper :deep(.ProseMirror ul) { list-style-type: disc; }
+.rich-text-editor-wrapper :deep(.ProseMirror ol) { list-style-type: decimal; }
+.rich-text-editor-wrapper :deep(.ProseMirror li) { margin-bottom: 0.25rem; }
+.rich-text-editor-wrapper :deep(.ProseMirror a) { color: var(--primary-500); text-decoration: underline; }
+.rich-text-editor-wrapper :deep(.ProseMirror a:hover) { color: var(--primary-600); }
+.rich-text-editor-wrapper :deep(.ProseMirror img) { max-width: 100%; height: auto; border-radius: 0.375rem; }
+.rich-text-editor-wrapper :deep(.ProseMirror blockquote) {
+  border-left: 3px solid var(--primary-500);
+  padding-left: 1rem;
+  margin-left: 0;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.dark .rich-text-editor-wrapper :deep(.ProseMirror p.is-editor-empty:first-child::before) { color: #6b7280; }
+.dark .rich-text-editor-wrapper :deep(.ProseMirror a) { color: var(--primary-300); }
+.dark .rich-text-editor-wrapper :deep(.ProseMirror a:hover) { color: var(--primary-200); }
+.dark .rich-text-editor-wrapper :deep(.ProseMirror blockquote) { color: var(--text-secondary); }

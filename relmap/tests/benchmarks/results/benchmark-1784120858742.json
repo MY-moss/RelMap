@@ -1,0 +1,62 @@
+[
+  {
+    "name": "levenshtein_10chars",
+    "duration": 1.9163999999999533,
+    "iterations": 5,
+    "avgDuration": 0.38327999999999063,
+    "minDuration": 0.3203999999999496,
+    "maxDuration": 0.5130000000000337,
+    "unit": "ms",
+    "timestamp": "2026-07-15T13:07:38.696Z"
+  },
+  {
+    "name": "string_similarity",
+    "duration": 4.425400000000195,
+    "iterations": 5,
+    "avgDuration": 0.8850800000000391,
+    "minDuration": 0.59800000000007,
+    "maxDuration": 1.3087000000000444,
+    "unit": "ms",
+    "timestamp": "2026-07-15T13:07:38.707Z"
+  },
+  {
+    "name": "extract_keywords",
+    "duration": 15.796299999999974,
+    "iterations": 5,
+    "avgDuration": 3.159259999999995,
+    "minDuration": 2.4163999999999533,
+    "maxDuration": 4.485000000000014,
+    "unit": "ms",
+    "timestamp": "2026-07-15T13:07:38.729Z"
+  },
+  {
+    "name": "analyze_emotion",
+    "duration": 4.529700000000048,
+    "iterations": 5,
+    "avgDuration": 0.9059400000000096,
+    "minDuration": 0.6745999999999412,
+    "maxDuration": 1.0978000000000065,
+    "unit": "ms",
+    "timestamp": "2026-07-15T13:07:38.734Z"
+  },
+  {
+    "name": "json_stringify_1000",
+    "duration": 1.9256999999998925,
+    "iterations": 5,
+    "avgDuration": 0.3851399999999785,
+    "minDuration": 0.23559999999997672,
+    "maxDuration": 0.674199999999928,
+    "unit": "ms",
+    "timestamp": "2026-07-15T13:07:38.737Z"
+  },
+  {
+    "name": "json_parse_1000",
+    "duration": 3.480099999999993,
+    "iterations": 5,
+    "avgDuration": 0.6960199999999986,
+    "minDuration": 0.48720000000002983,
+    "maxDuration": 0.8967000000000098,
+    "unit": "ms",
+    "timestamp": "2026-07-15T13:07:38.742Z"
+  }
+]

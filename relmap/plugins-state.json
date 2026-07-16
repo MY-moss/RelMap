@@ -1,0 +1,5 @@
+{
+  "ollama-bridge": {
+    "enabled": true
+  }
+}

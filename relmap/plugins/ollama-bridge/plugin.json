@@ -1,0 +1,13 @@
+{
+  "name": "ollama-bridge",
+  "version": "1.0.0",
+  "description": "本地 Ollama LLM 推理桥接 — 为 RelMap 提供隐私优先的 AI 能力",
+  "author": "RelMap Team",
+  "main": "index.js",
+  "hooks": ["app:ready", "person:created"],
+  "permissions": ["network", "db:read", "notification"],
+  "actions": ["query", "models"],
+  "ui": {
+    "slots": ["sidebar"]
+  }
+}
