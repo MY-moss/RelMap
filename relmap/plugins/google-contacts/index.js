@@ -2,7 +2,28 @@ const GOOGLE_PEOPLE_API = 'https://people.googleapis.com/v1/people/me/connection
 const PAGE_SIZE = 200
 let syncInterval = null
 let lastSyncToken = null
+let lastSyncTime = null
 let _api = null
+
+async function loadSyncToken() {
+  const val = await _api.getConfig('lastSyncToken')
+  if (val) lastSyncToken = val
+}
+
+async function saveSyncToken(token) {
+  lastSyncToken = token
+  await _api.setConfig('lastSyncToken', token)
+}
+
+async function loadSyncTime() {
+  const val = await _api.getConfig('lastSyncTime')
+  if (val) lastSyncTime = val
+}
+
+async function saveSyncTime() {
+  lastSyncTime = new Date().toISOString()
+  await _api.setConfig('lastSyncTime', lastSyncTime)
+}
 
 async function getToken() {
   const result = await _api.getToken('google-contacts')
@@ -74,11 +95,16 @@ async function runSync() {
       lastResult = data
     } while (pageToken)
 
-    if (lastResult?.nextSyncToken) lastSyncToken = lastResult.nextSyncToken
+    if (lastResult?.nextSyncToken) await saveSyncToken(lastResult.nextSyncToken)
+    await saveSyncTime()
     _api.logger.info(`Sync complete: ${synced} imported, ${skipped} skipped`)
     if (synced > 0) _api.notify('Google Contacts', `已同步 ${synced} 位联系人`)
   } catch (err) {
     _api.logger.error(`Sync failed: ${err.message}`)
+    if (err.message.includes('404') || err.message.includes('410')) {
+      _api.logger.info('Sync token expired, resetting for full resync')
+      await saveSyncToken(null)
+    }
   }
 }
 
@@ -91,11 +117,13 @@ export default function setup(api) {
   })
 
   api.registerIPC('syncStatus', async () => {
-    return { success: true, data: { lastSync: lastSyncToken ? 'synced' : 'never' } }
+    return { success: true, data: { lastSync: lastSyncTime || 'never' } }
   })
 
   api.on('app:ready', async () => {
     _api.logger.info('Google Contacts plugin ready')
+    await loadSyncToken()
+    await loadSyncTime()
     await runSync()
     syncInterval = setInterval(() => runSync(), 30 * 60 * 1000)
   })

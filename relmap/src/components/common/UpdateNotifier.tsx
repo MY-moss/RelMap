@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const updateApi = (window.electronAPI as any).update
+const updateApi = window.electronAPI!.update
 
 export default function UpdateNotifier() {
   const [state, setState] = useState<'idle' | 'checking' | 'available' | 'downloading' | 'downloaded' | 'error'>('idle')

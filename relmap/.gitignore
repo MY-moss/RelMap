@@ -32,6 +32,10 @@ temp/
 build_out/
 release_new/
 release_new2/
+release_v2/
+release_v3/
+release_v4/
+docs/.vitepress/dist/
 coverage/
 
 # 数据备份（排除上传）

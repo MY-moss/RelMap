@@ -4,6 +4,15 @@ import type { Result, PluginInfo } from '../../src/shared/types'
 import { showOpenDialogHelper } from './dialog-helper'
 import { logger } from '../logger'
 
+const HANDLER_TIMEOUT_MS = 30000
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`Handler timed out after ${ms}ms`)), ms)),
+  ])
+}
+
 function validatePluginName(name: string): boolean {
   if (typeof name !== 'string') return false
   if (name.length < 1 || name.length > 100) return false
@@ -114,7 +123,7 @@ export function registerPluginIPC(): void {
       if (!ctx) return { success: false, error: 'Plugin not found' }
       const handler = ctx.pluginHandlers.get(handlerName)
       if (!handler) return { success: false, error: `Handler "${handlerName}" not found in plugin "${pluginName}"` }
-      const result = await handler(...args)
+      const result = await withTimeout(Promise.resolve(handler(...args)), HANDLER_TIMEOUT_MS)
       return { success: true, data: result }
     } catch (e) {
       return { success: false, error: (e as Error).message }

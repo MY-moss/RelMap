@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App.tsx'
 import ErrorBoundary from './components/common/ErrorBoundary'
 import './index.css'
+import './i18n'
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN || ''
 const sentryEnabled = localStorage.getItem('sentryEnabled') !== 'false'
@@ -38,8 +39,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </QueryClientProvider>
   </React.StrictMode>,
 )
-
-// Deferred i18n init (non-critical, doesn't block paint)
-import('./i18n')
 
 

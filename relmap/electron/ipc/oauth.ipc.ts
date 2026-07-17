@@ -143,7 +143,7 @@ export function registerOAuthIPC(): void {
         const authWindow = new BrowserWindow({
           width: 600,
           height: 700,
-          title: `RelMap �?${provider} 授权`,
+          title: `RelMap �?${provider} 授权`,
           webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
@@ -152,6 +152,18 @@ export function registerOAuthIPC(): void {
 
         authWindow.loadURL(authUrl)
 
+        const AUTH_TIMEOUT_MS = 5 * 60 * 1000
+        const authTimeout = setTimeout(() => {
+          authWindow.removeAllListeners('closed')
+          authWindow.close()
+          reject(new Error('Authorization timed out'))
+        }, AUTH_TIMEOUT_MS)
+
+        const cleanup = () => {
+          clearTimeout(authTimeout)
+          authWindow.removeAllListeners('closed')
+        }
+
         const handleCallbackUrl = (url: string) => {
           try {
             if (!url.startsWith(config.redirectUri)) return
@@ -159,11 +171,13 @@ export function registerOAuthIPC(): void {
             const codeParam = urlObj.searchParams.get('code')
             const errorParam = urlObj.searchParams.get('error')
             if (errorParam) {
+              cleanup()
               reject(new Error(`Authorization denied: ${errorParam}`))
               authWindow.close()
               return
             }
             if (codeParam) {
+              cleanup()
               resolve(codeParam)
               authWindow.close()
             }
@@ -175,6 +189,7 @@ export function registerOAuthIPC(): void {
         authWindow.webContents.on('did-navigate', (_event, url) => handleCallbackUrl(url))
 
         authWindow.on('closed', () => {
+          cleanup()
           reject(new Error('Authorization window closed by user'))
         })
       })
@@ -206,7 +221,7 @@ export function registerOAuthIPC(): void {
         return { success: false, error: 'No credentials found' } as const
       }
 
-      if (cred.expiryDate && new Date(cred.expiryDate) < new Date() && cred.refreshToken) {
+      if (cred.refreshToken && (!cred.expiryDate || new Date(cred.expiryDate) < new Date())) {
         const providerConfig = PROVIDER_CONFIGS[provider]
         if (!providerConfig) {
           return { success: false, error: `Unknown provider: ${provider}` } as const
@@ -231,7 +246,8 @@ export function registerOAuthIPC(): void {
 
       return { success: true, data: cred.accessToken } as const
     } catch (err) {
-      return { success: false, error: (err as Error).message } as const
+      credentials.deleteCredentials(pluginId, provider)
+      return { success: false, error: 'Token refresh failed, credentials cleared. Please re-authorize.' } as const
     }
   })
 

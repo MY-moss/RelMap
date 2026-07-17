@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
                   'tesseract.js',
                   'face-api.js',
                   'canvas',
-                  '@sentry/electron',
+                  'better-sqlite3-multiple-ciphers',
                 ],
               },
             },

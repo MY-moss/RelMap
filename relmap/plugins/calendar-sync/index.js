@@ -1,7 +1,11 @@
 const GOOGLE_CALENDAR_API = 'https://www.googleapis.com/calendar/v3'
+const DEFAULT_DAYS_BACK = 30
+const DEFAULT_DAYS_FORWARD = 90
 let syncInterval = null
 let selectedCalendars = []
 let lastSyncTime = null
+let daysBack = DEFAULT_DAYS_BACK
+let daysForward = DEFAULT_DAYS_FORWARD
 let _api = null
 
 async function getToken() {
@@ -22,8 +26,8 @@ async function fetchCalendarList() {
 async function fetchEvents(calendarId) {
   const token = await getToken()
   const params = new URLSearchParams({
-    timeMin: new Date(Date.now() - 30 * 86400000).toISOString(),
-    timeMax: new Date(Date.now() + 90 * 86400000).toISOString(),
+    timeMin: new Date(Date.now() - daysBack * 86400000).toISOString(),
+    timeMax: new Date(Date.now() + daysForward * 86400000).toISOString(),
     singleEvents: 'true',
     orderBy: 'startTime',
   })
@@ -94,9 +98,26 @@ export default function setup(api) {
     return { success: true }
   })
 
+  api.registerIPC('getRange', async () => {
+    return { success: true, data: { daysBack, daysForward } }
+  })
+
+  api.registerIPC('setRange', async (data) => {
+    if (data && typeof data.daysBack === 'number') daysBack = Math.max(1, Math.min(365, data.daysBack))
+    if (data && typeof data.daysForward === 'number') daysForward = Math.max(1, Math.min(365, data.daysForward))
+    await _api.setConfig('daysBack', daysBack)
+    await _api.setConfig('daysForward', daysForward)
+    _api.logger.info(`Sync range updated: ${daysBack}d back, ${daysForward}d forward`)
+    return { success: true }
+  })
+
   api.on('app:ready', async () => {
     const saved = await _api.getConfig('selectedCalendars')
     if (saved) selectedCalendars = saved
+    const savedBack = await _api.getConfig('daysBack')
+    if (typeof savedBack === 'number') daysBack = savedBack
+    const savedForward = await _api.getConfig('daysForward')
+    if (typeof savedForward === 'number') daysForward = savedForward
     _api.logger.info('Calendar sync plugin ready')
     syncInterval = setInterval(() => runSync(), 60 * 60 * 1000)
   })

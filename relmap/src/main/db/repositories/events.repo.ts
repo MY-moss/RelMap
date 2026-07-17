@@ -133,10 +133,20 @@ export function updateEvent(id: string, data: UpdateEventDto): Result<EventItem>
 export function deleteEvent(id: string): Result<void> {
   try {
     const db = getDb()
-    const result = db.prepare('DELETE FROM events WHERE id = ?').run(id)
-    if (result.changes === 0) {
-      return { success: false, error: `事件 ${id} 不存在` }
-    }
+    const deleteEventPersons = db.prepare('DELETE FROM event_persons WHERE event_id = ?')
+    const deleteTaggings = db.prepare("DELETE FROM taggings WHERE target_id = ? AND target_type = 'event'")
+    const deleteExternalIds = db.prepare("DELETE FROM external_ids WHERE target_id = ? AND target_type = 'event'")
+    const deleteEvent = db.prepare('DELETE FROM events WHERE id = ?')
+    const doDelete = db.transaction(() => {
+      deleteEventPersons.run(id)
+      deleteTaggings.run(id)
+      deleteExternalIds.run(id)
+      const result = deleteEvent.run(id)
+      if (result.changes === 0) {
+        throw new Error(`事件 ${id} 不存在`)
+      }
+    })
+    doDelete()
     pluginManager.emitEvent('event:deleted', { id }).catch(() => {})
     return { success: true, data: undefined }
   } catch (e) {

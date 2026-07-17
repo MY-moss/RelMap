@@ -22,7 +22,7 @@ const MASTER_KEY_FILE = path.join(app.getPath('userData'), '.master-key.enc')
 export interface AppConfig {
   pinHash?: string
   pinSalt?: string
-  aiProviders?: Record<string, { apiKey?: string; baseUrl?: string; enabled?: boolean }>
+  aiProviders?: Record<string, { apiKey?: string; baseUrl?: string; model?: string; enabled?: boolean }>
   telemetryConsentGiven?: boolean
   sentryEnabled?: boolean
   darkMode?: boolean

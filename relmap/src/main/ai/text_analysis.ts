@@ -17,9 +17,15 @@ export interface EmotionResult {
   negativeWords: string[]
 }
 
+// 否定词表（用于情感分析中的否定翻转）
+const NEGATION_WORDS = new Set<string>([
+  '不', '没', '别', '无', '未', '莫', '勿', '毋',
+  '不要', '没有', '不用', '不必', '不能', '不会', '不是', '未曾', '未尝',
+])
+
 // 中文停用词表
 const STOP_WORDS = new Set<string>([
-  '的', '了', '是', '在', '我', '有', '和', '就', '不', '人',
+  '的', '了', '是', '在', '我', '有', '和', '就', '人',
   '都', '一', '一个', '上', '也', '很', '到', '说', '要', '去',
   '你', '会', '着', '没有', '看', '好', '自己', '这',
 ])
@@ -202,6 +208,15 @@ export function extractKeywords(text: string, topN: number = 10): Result<Keyword
   }
 }
 
+// 检查词前面是否有否定词修饰
+function isNegated(_word: string, pos: number, text: string): boolean {
+  const before = text.slice(Math.max(0, pos - 4), pos)
+  for (const neg of NEGATION_WORDS) {
+    if (before.endsWith(neg)) return true
+  }
+  return false
+}
+
 /**
  * 情感分析（基于情感词典）
  *
@@ -231,14 +246,16 @@ export function analyzeEmotion(text: string): Result<EmotionResult> {
 
     // 统计积极词出现情况（去重记录匹配到的词）
     for (const word of POSITIVE_WORDS) {
-      if (text.includes(word)) {
+      const idx = text.indexOf(word)
+      if (idx !== -1 && !isNegated(word, idx, text)) {
         matchedPositive.push(word)
       }
     }
 
     // 统计消极词出现情况
     for (const word of NEGATIVE_WORDS) {
-      if (text.includes(word)) {
+      const idx = text.indexOf(word)
+      if (idx !== -1 && !isNegated(word, idx, text)) {
         matchedNegative.push(word)
       }
     }

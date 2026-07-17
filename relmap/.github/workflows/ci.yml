@@ -16,8 +16,15 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run lint
-      - run: npx tsc --noEmit
+      - run: npm run typecheck
       - run: npm run test
-      - run: npm run build
+      - run: npm run test:coverage
+      - uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+      - run: npx vite build
+      - run: npx electron-builder --linux
         env:
           CI: true
+          USE_HARD_LINKS: false

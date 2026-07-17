@@ -136,10 +136,18 @@ export function updatePerson(id: string, data: UpdatePersonDto): Result<Person> 
 export function deletePerson(id: string): Result<void> {
   try {
     const db = getDb()
-    const result = db.prepare('DELETE FROM persons WHERE id = ?').run(id)
-    if (result.changes === 0) {
-      return { success: false, error: `Person not found: ${id}` }
-    }
+    const deleteTaggings = db.prepare("DELETE FROM taggings WHERE target_id = ? AND target_type = 'person'")
+    const deleteExternalIds = db.prepare("DELETE FROM external_ids WHERE target_id = ? AND target_type = 'person'")
+    const deletePerson = db.prepare('DELETE FROM persons WHERE id = ?')
+    const doDelete = db.transaction(() => {
+      deleteTaggings.run(id)
+      deleteExternalIds.run(id)
+      const result = deletePerson.run(id)
+      if (result.changes === 0) {
+        throw new Error(`Person not found: ${id}`)
+      }
+    })
+    doDelete()
     pluginManager.emitEvent('person:deleted', { id }).catch(() => {})
     return { success: true, data: undefined }
   } catch (e) {

@@ -52,8 +52,14 @@ export function registerUpdateIPC(): void {
   })
 
   autoUpdater.on('error', (err) => {
+    const msg = err.message
+    // 开发/便携版模式下没有 app-update.yml 属于正常情况，不打扰用户
+    if (msg.includes('app-update.yml') || msg.includes('ENOENT')) {
+      logger.warn('[Updater] 未找到更新配置文件（开发模式或便携版），跳过检查')
+      return
+    }
     logger.error({ err }, '[Updater] 检查更新失败')
-    send('update:error', err.message)
+    send('update:error', msg)
   })
 
   ipcMain.handle('update:check', async () => {

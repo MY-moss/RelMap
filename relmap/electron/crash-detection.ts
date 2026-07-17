@@ -9,11 +9,16 @@ const RUNNING_FLAG = isDev
   : path.join(app.getPath('userData'), '.running')
 
 export function checkCrashRecovery(): boolean {
-  const crashed = fs.existsSync(RUNNING_FLAG)
-  if (crashed) {
-    logger.warn({ module: 'startup' }, 'Previous crash detected')
+  let crashed = false
+  try {
+    crashed = fs.existsSync(RUNNING_FLAG)
+    if (crashed) {
+      logger.warn({ module: 'startup' }, 'Previous crash detected')
+    }
+    fs.writeFileSync(RUNNING_FLAG, String(Date.now()))
+  } catch (err) {
+    logger.warn({ err, module: 'startup' }, 'Failed to access running flag file')
   }
-  fs.writeFileSync(RUNNING_FLAG, String(Date.now()))
   return crashed
 }
 

@@ -94,10 +94,18 @@ export function updateDiary(id: string, data: UpdateDiaryDto): Result<Diary> {
 export function deleteDiary(id: string): Result<void> {
   try {
     const db = getDb()
-    const result = db.prepare(`DELETE FROM diaries WHERE id = ?`).run(id)
-    if (result.changes === 0) {
-      return { success: false, error: '日记不存在' }
-    }
+    const deleteDiaryPersons = db.prepare('DELETE FROM diary_persons WHERE diary_id = ?')
+    const deleteTaggings = db.prepare("DELETE FROM taggings WHERE target_id = ? AND target_type = 'diary'")
+    const deleteDiary = db.prepare('DELETE FROM diaries WHERE id = ?')
+    const doDelete = db.transaction(() => {
+      deleteDiaryPersons.run(id)
+      deleteTaggings.run(id)
+      const result = deleteDiary.run(id)
+      if (result.changes === 0) {
+        throw new Error('日记不存在')
+      }
+    })
+    doDelete()
     pluginManager.emitEvent('diary:deleted', { id }).catch(() => {})
     return { success: true, data: undefined }
   } catch (e) {

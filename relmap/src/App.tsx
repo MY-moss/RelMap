@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import ErrorBoundary from './components/common/ErrorBoundary'
 import { ToastProvider } from './components/common/ToastContext'
@@ -76,27 +76,27 @@ export default function App() {
       <ToastProvider>
         <TelemetryConsent />
         <UpdateNotifier />
-        <BrowserRouter>
+        <HashRouter>
           <NotificationInit />
           <Suspense fallback={<div className="p-6 text-gray-500">加载中...</div>}>
             <Routes>
               <Route element={<AppLayout />}>
-                <Route index element={<HomePage />} />
-                <Route path="follow-up" element={<FollowUpPage />} />
-                <Route path="persons" element={<PersonsPage />} />
-                <Route path="persons/:id" element={<PersonDetailPage />} />
-                <Route path="graph" element={<GraphPage />} />
-                <Route path="timeline" element={<TimelinePage />} />
-                <Route path="photos" element={<PhotosPage />} />
-                <Route path="settings" element={<SettingsPage />} />
-                <Route path="help" element={<HelpPage />} />
-                <Route path="analytics" element={<AnalyticsPage />} />
-                <Route path="wrapped" element={<WrappedPage />} />
-                <Route path="ai" element={<AiChatPage />} />
+                <Route index element={<ErrorBoundary><HomePage /></ErrorBoundary>} />
+                <Route path="follow-up" element={<ErrorBoundary><FollowUpPage /></ErrorBoundary>} />
+                <Route path="persons" element={<ErrorBoundary><PersonsPage /></ErrorBoundary>} />
+                <Route path="persons/:id" element={<ErrorBoundary><PersonDetailPage /></ErrorBoundary>} />
+                <Route path="graph" element={<ErrorBoundary><GraphPage /></ErrorBoundary>} />
+                <Route path="timeline" element={<ErrorBoundary><TimelinePage /></ErrorBoundary>} />
+                <Route path="photos" element={<ErrorBoundary><PhotosPage /></ErrorBoundary>} />
+                <Route path="settings" element={<ErrorBoundary><SettingsPage /></ErrorBoundary>} />
+                <Route path="help" element={<ErrorBoundary><HelpPage /></ErrorBoundary>} />
+                <Route path="analytics" element={<ErrorBoundary><AnalyticsPage /></ErrorBoundary>} />
+                <Route path="wrapped" element={<ErrorBoundary><WrappedPage /></ErrorBoundary>} />
+                <Route path="ai" element={<ErrorBoundary><AiChatPage /></ErrorBoundary>} />
               </Route>
             </Routes>
           </Suspense>
-        </BrowserRouter>
+        </HashRouter>
       </ToastProvider>
     </ErrorBoundary>
   )

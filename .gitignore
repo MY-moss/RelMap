@@ -31,6 +31,18 @@ release_new/
 release_new2/
 coverage/
 
+# Generated js/dts from tsconfig references
+relmap/src/main/**/*.js
+relmap/src/main/**/*.d.ts
+relmap/src/shared/**/*.js
+relmap/src/shared/**/*.d.ts
+relmap/vite.config.js
+relmap/vite.config.d.ts
+
+# Build caches
+relmap/.npm-cache/
+relmap/electron/dist/
+
 # User data & assets
 relmap/public/assets/
 relmap/logs/

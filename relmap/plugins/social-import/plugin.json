@@ -1,12 +1,12 @@
 {
   "name": "social-import",
   "version": "1.0.0",
-  "description": "社交平台联系人导入 — 从 LinkedIn / Facebook / 微信 / vCard 批量导入联系人到 RelMap",
+  "description": "社交平台联系人导入 — 从 LinkedIn / Facebook / vCard 批量导入联系人到 RelMap",
   "author": "RelMap Team",
   "main": "index.js",
   "hooks": [],
   "permissions": ["network", "db:read", "db:write", "filesystem", "notification"],
-  "actions": ["importLinkedIn", "importFacebook", "importWeChat", "importVCard", "importStatus"],
+  "actions": ["importLinkedIn", "importFacebook", "importVCard"],
   "ui": {
     "slots": ["settings:plugin", "person:import"]
   }

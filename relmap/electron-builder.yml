@@ -14,6 +14,12 @@ files:
   - "!**/*.{md,markdown}"
   - "!**/.{idea,git,cache,vscode,DS_Store}"
 
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Office
+
 win:
   target:
     - target: nsis
@@ -30,6 +36,12 @@ nsis:
   createStartMenuShortcut: true
   shortcutName: RelMap
   deleteAppDataOnUninstall: false
+
+publish:
+  - provider: github
+    owner: MY-moss
+    repo: RelMap
+    releaseType: release
 
 npmRebuild: false
 nodeGypRebuild: false

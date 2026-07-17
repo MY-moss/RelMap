@@ -86,6 +86,21 @@ function createWindow() {
   } else {
     win.loadFile(path.join(RENDERER_DIST, 'index.html'))
   }
+
+  // 渲染进程诊断日志
+  win.webContents.on('console-message', (_e, level, message, line, sourceId) => {
+    const levelStr = ['LOG', 'WARN', 'ERROR'][level] || 'LOG'
+    logger.info({ module: 'renderer', level: levelStr, line, source: sourceId }, `[Renderer] ${message}`)
+  })
+  win.webContents.on('did-fail-load', (_e, errorCode, errorDescription, validatedURL) => {
+    logger.error({ module: 'renderer', errorCode, errorDescription, validatedURL }, '[Renderer] 页面加载失败')
+  })
+  win.webContents.on('render-process-gone', (_e, details) => {
+    logger.error({ module: 'renderer', details }, '[Renderer] 渲染进程崩溃')
+  })
+  win.webContents.on('preload-error', (_e, preloadPath, error) => {
+    logger.error({ module: 'renderer', preloadPath, error: String(error) }, '[Renderer] preload 脚本错误')
+  })
 }
 
 app.on('window-all-closed', () => {

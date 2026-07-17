@@ -15,19 +15,38 @@ function run(cmd) {
   }
 }
 
+function resolveVersion(input) {
+  const semverKeywords = { major: 0, minor: 1, patch: 2 }
+  if (input in semverKeywords || /^\d+\.\d+\.\d+$/.test(input)) {
+    return input
+  }
+  return null
+}
+
 function main() {
   const args = process.argv.slice(2)
-  const version = args[0]
+  const rawVersion = args[0]
 
-  if (!version) {
-    console.error('Usage: node scripts/release.mjs <version>')
+  if (!rawVersion) {
+    console.error('Usage: node scripts/release.mjs <version|patch|minor|major>')
     console.error('Example: node scripts/release.mjs 2.0.0')
+    console.error('         npm run release:patch')
     process.exit(1)
   }
 
   const pkgPath = path.resolve(__dirname, '../package.json')
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
   const currentVersion = pkg.version
+
+  let version = rawVersion
+  if (/^(major|minor|patch)$/.test(rawVersion)) {
+    const parts = currentVersion.split('.').map(Number)
+    const idx = { major: 0, minor: 1, patch: 2 }[rawVersion]
+    parts[idx]++
+    for (let i = idx + 1; i < 3; i++) parts[i] = 0
+    version = parts.join('.')
+    console.log(`  ${rawVersion} bump: ${currentVersion} -> ${version}`)
+  }
 
   console.log(`=== RelMap Release Script ===`)
   console.log(`Current version: ${currentVersion}`)

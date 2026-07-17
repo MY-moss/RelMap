@@ -12,6 +12,8 @@ import { getCredentials } from '../../../electron/ipc/credentials-manager'
 import { getDb } from '../db/connection'
 import { setExternalId, getByExternalId } from '../db/repositories/external_ids.repo'
 
+const IPC_HANDLER_TIMEOUT = 30000
+
 interface PluginContext {
   manifest: PluginManifest
   enabled: boolean
@@ -39,6 +41,7 @@ export class PluginManager {
   private plugins = new Map<string, PluginContext>()
   private pluginsDir: string
   private statePath: string
+  private appReadyFired = false
   constructor() {
     const isDev = !!process.env['VITE_DEV_SERVER_URL']
     const root = process.env.APP_ROOT || process.cwd()
@@ -78,24 +81,10 @@ export class PluginManager {
   async initialize(): Promise<void> {
     await this.scanPlugins()
     await this.loadState()
-    this.registerBuiltinIPC()
+    // 注意：plugin:getLogs 和 plugin:getStatus 的 IPC 处理器
+    // 已在 electron/ipc/plugin.ipc.ts 的 registerPluginIPC() 中注册，
+    // 此处不再重复注册以避免 "Attempted to register a second handler" 错误。
     logger.info('[PluginManager] Initialized')
-  }
-
-  private registerBuiltinIPC(): void {
-    ipcMain.handle('plugin:getLogs', async (_event, name: string) => {
-      if (!this.validatePluginName(name)) return { success: false, error: 'Invalid plugin name' } as const
-      const ctx = this.plugins.get(name)
-      if (!ctx) return { success: false, error: 'Plugin not found' } as const
-      return { success: true, data: ctx.logs.slice(-200) } as const
-    })
-
-    ipcMain.handle('plugin:getStatus', async (_event, name: string) => {
-      if (!this.validatePluginName(name)) return { success: false, error: 'Invalid plugin name' } as const
-      const ctx = this.plugins.get(name)
-      if (!ctx) return { success: false, error: 'Plugin not found' } as const
-      return { success: true, data: this.toPluginInfo(ctx) } as const
-    })
   }
 
   async scanPlugins(): Promise<PluginManifest[]> {
@@ -205,6 +194,15 @@ export class PluginManager {
         }
       }
 
+      // If app:ready already fired, trigger hooks immediately for this plugin
+      if (this.appReadyFired) {
+        for (const { event: ev, handler } of ctx.eventHandlers) {
+          if (ev === 'app:ready') {
+            Promise.resolve(handler()).catch((err: Error) => this.log(name, `app:ready hook failed: ${err.message}`))
+          }
+        }
+      }
+
       this.log(name, 'Plugin enabled and running')
     } catch (err) {
       ctx.status = 'error'
@@ -298,7 +296,10 @@ export class PluginManager {
                 }
               }
             }
-            return handler(...args)
+            return await Promise.race([
+              Promise.resolve(handler(...args)),
+              new Promise((_, reject) => setTimeout(() => reject(new Error(`Handler timed out after ${IPC_HANDLER_TIMEOUT}ms`)), IPC_HANDLER_TIMEOUT)),
+            ])
           })
           ctx.registeredIpcChannels.push(fullChannel)
           ctx.pluginHandlers.set(channel, handler)
@@ -445,6 +446,7 @@ export class PluginManager {
   }
 
   async emitEvent(event: string, ...args: unknown[]): Promise<void> {
+    if (event === 'app:ready') this.appReadyFired = true
     await eventBus.emit(event, ...args)
   }
 

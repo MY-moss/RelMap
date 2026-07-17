@@ -1,12 +1,36 @@
 let _api = null
 
+function parseCSVLine(line) {
+  const fields = []
+  let current = ''
+  let inQuotes = false
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i]
+    if (ch === '"') {
+      if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
+        current += '"'
+        i++
+      } else {
+        inQuotes = !inQuotes
+      }
+    } else if (ch === ',' && !inQuotes) {
+      fields.push(current.replace(/^"|"$/g, '').trim())
+      current = ''
+    } else {
+      current += ch
+    }
+  }
+  fields.push(current.replace(/^"|"$/g, '').trim())
+  return fields
+}
+
 function parseLinkedInCSV(csvText) {
   const lines = csvText.split('\n').filter(Boolean)
   if (lines.length < 2) return []
-  const headers = lines[0].split(',').map((h) => h.trim().toLowerCase())
+  const headers = parseCSVLine(lines[0]).map((h) => h.trim().toLowerCase())
   const results = []
   for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map((v) => v.trim().replace(/^"|"$/g, ''))
+    const values = parseCSVLine(lines[i])
     const row = {}
     headers.forEach((h, idx) => { row[h] = values[idx] || '' })
     if (row['first name'] || row['name']) {
@@ -23,11 +47,20 @@ function parseLinkedInCSV(csvText) {
 
 function parseFacebookHTML(htmlText) {
   const names = []
-  const regex = /<div[^>]*class="[^"]*name[^"]*"[^>]*>([^<]+)<\/div>/gi
+  // Match <a> tags with facebook URLs (modern Facebook data export)
+  const linkRegex = /<a[^>]*href="https?:\/\/(?:www\.)?facebook\.com[^"]*"[^>]*>([^<]+)<\/a>/gi
   let match
-  while ((match = regex.exec(htmlText)) !== null) {
+  while ((match = linkRegex.exec(htmlText)) !== null) {
     const name = match[1].trim()
-    if (name && name.length > 1 && !name.includes('Friend')) names.push({ name })
+    if (name && name.length > 1) names.push({ name })
+  }
+  // Fallback: match <div> with class containing "name"
+  if (names.length === 0) {
+    const divRegex = /<div[^>]*class="[^"]*name[^"]*"[^>]*>([^<]+)<\/div>/gi
+    while ((match = divRegex.exec(htmlText)) !== null) {
+      const name = match[1].trim()
+      if (name && name.length > 1 && !name.includes('Friend')) names.push({ name })
+    }
   }
   return names
 }
@@ -65,15 +98,6 @@ export default function setup(api) {
       const imported = await deduplicateAndImport(contacts)
       if (imported > 0) _api.notify('Facebook Import', `已导入 ${imported} 位联系人`)
       return { success: true, data: { total: contacts.length, imported } }
-    } catch (err) {
-      return { success: false, error: err.message }
-    }
-  })
-
-  api.registerIPC('importWeChat', async (vcardText) => {
-    try {
-      const result = await _api.importVCard(vcardText)
-      return result
     } catch (err) {
       return { success: false, error: err.message }
     }

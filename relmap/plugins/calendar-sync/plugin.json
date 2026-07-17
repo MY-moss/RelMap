@@ -6,7 +6,7 @@
   "main": "index.js",
   "hooks": ["app:ready", "event:created"],
   "permissions": ["network", "db:read", "db:write", "notification"],
-  "actions": ["sync", "syncStatus", "selectCalendars"],
+  "actions": ["sync", "syncStatus", "selectCalendars", "getRange", "setRange"],
   "ui": {
     "slots": ["settings:plugin"]
   }

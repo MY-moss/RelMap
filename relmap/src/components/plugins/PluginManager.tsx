@@ -24,7 +24,6 @@ const STATUS_COLORS: Record<string, string> = {
 const OAUTH_PROVIDERS: Record<string, string> = {
   'google-contacts': 'google-contacts',
   'calendar-sync': 'google-calendar',
-  'social-import': 'linkedin',
 }
 
 export default function PluginManager() {
@@ -36,6 +35,7 @@ export default function PluginManager() {
   const [logsLoading, setLogsLoading] = useState(false)
   const [authStatus, setAuthStatus] = useState<Record<string, boolean>>({})
   const [authing, setAuthing] = useState<string | null>(null)
+  const [rangeConfig, setRangeConfig] = useState<Record<string, { daysBack: number; daysForward: number }>>({})
 
   const scan = useCallback(async () => {
     setLoading(true)
@@ -61,14 +61,22 @@ export default function PluginManager() {
   useEffect(() => {
     const checkAuth = async () => {
       const status: Record<string, boolean> = {}
+      const ranges: Record<string, { daysBack: number; daysForward: number }> = {}
       for (const p of plugins) {
         const provider = OAUTH_PROVIDERS[p.name]
         if (provider) {
           const result = await window.electronAPI.oauth.hasCredentials(p.name, provider)
           if (result.success) status[p.name] = result.data
         }
+        if (p.name === 'calendar-sync') {
+          const rangeResult = await window.electronAPI.plugin.callHandler(p.name, 'getRange')
+          if (rangeResult.success && rangeResult.data) {
+            ranges[p.name] = rangeResult.data as { daysBack: number; daysForward: number }
+          }
+        }
       }
       setAuthStatus(status)
+      setRangeConfig(ranges)
     }
     if (plugins.length > 0) checkAuth()
   }, [plugins])
@@ -89,7 +97,7 @@ export default function PluginManager() {
         if (isCsv) {
           result = await window.electronAPI.plugin.callHandler(pluginName, 'importLinkedIn', text)
         } else if (isVcf) {
-          result = await window.electronAPI.plugin.callHandler(pluginName, 'importWeChat', text)
+          result = await window.electronAPI.plugin.callHandler(pluginName, 'importVCard', text)
         } else if (isHtml) {
           result = await window.electronAPI.plugin.callHandler(pluginName, 'importFacebook', text)
         } else {
@@ -173,6 +181,8 @@ export default function PluginManager() {
       const result = await window.electronAPI.plugin.getPluginLogs(name)
       if (result.success) {
         setPluginLogs(result.data)
+      } else {
+        setPluginLogs(['获取日志失败: ' + (result.error || '未知错误')])
       }
     } catch {
       setPluginLogs(['无法获取日志'])
@@ -180,6 +190,13 @@ export default function PluginManager() {
       setLogsLoading(false)
     }
   }, [])
+
+  const handleRangeChange = useCallback(async (pluginName: string, field: 'daysBack' | 'daysForward', value: number) => {
+    const current = rangeConfig[pluginName] || { daysBack: 30, daysForward: 90 }
+    const updated = { ...current, [field]: Math.max(1, Math.min(365, value)) }
+    setRangeConfig((prev) => ({ ...prev, [pluginName]: updated }))
+    await window.electronAPI.plugin.callHandler(pluginName, 'setRange', updated)
+  }, [rangeConfig])
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -307,6 +324,35 @@ export default function PluginManager() {
                     >
                       {authing === plugin.name ? '授权中...' : authStatus[plugin.name] ? '已授权 ✓' : '授权'}
                     </button>
+                  )}
+
+                  {plugin.name === 'calendar-sync' && rangeConfig['calendar-sync'] && (
+                    <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
+                      <label className="flex items-center gap-1">
+                        回溯:
+                        <input
+                          type="number"
+                          min="1"
+                          max="365"
+                          value={rangeConfig['calendar-sync'].daysBack}
+                          onChange={(e) => handleRangeChange('calendar-sync', 'daysBack', parseInt(e.target.value) || 30)}
+                          className="w-16 px-1.5 py-0.5 border border-gray-200 rounded text-gray-700 text-xs text-center"
+                        />
+                        天
+                      </label>
+                      <label className="flex items-center gap-1">
+                        前瞻:
+                        <input
+                          type="number"
+                          min="1"
+                          max="365"
+                          value={rangeConfig['calendar-sync'].daysForward}
+                          onChange={(e) => handleRangeChange('calendar-sync', 'daysForward', parseInt(e.target.value) || 90)}
+                          className="w-16 px-1.5 py-0.5 border border-gray-200 rounded text-gray-700 text-xs text-center"
+                        />
+                        天
+                      </label>
+                    </div>
                   )}
 
                   {plugin.name === 'social-import' && (
