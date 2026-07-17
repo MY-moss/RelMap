@@ -23,6 +23,7 @@ const HelpPage = lazy(() => import('./pages/HelpPage'))
 const WrappedPage = lazy(() => import('./pages/WrappedPage'))
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'))
 const AiChatPage = lazy(() => import('./pages/AiChatPage'))
+const CalendarPage = lazy(() => import('./pages/CalendarPage'))
 
 function NotificationInit() {
   useNotifications()
@@ -87,6 +88,7 @@ export default function App() {
                 <Route path="persons/:id" element={<ErrorBoundary><PersonDetailPage /></ErrorBoundary>} />
                 <Route path="graph" element={<ErrorBoundary><GraphPage /></ErrorBoundary>} />
                 <Route path="timeline" element={<ErrorBoundary><TimelinePage /></ErrorBoundary>} />
+                <Route path="calendar" element={<ErrorBoundary><CalendarPage /></ErrorBoundary>} />
                 <Route path="photos" element={<ErrorBoundary><PhotosPage /></ErrorBoundary>} />
                 <Route path="settings" element={<ErrorBoundary><SettingsPage /></ErrorBoundary>} />
                 <Route path="help" element={<ErrorBoundary><HelpPage /></ErrorBoundary>} />

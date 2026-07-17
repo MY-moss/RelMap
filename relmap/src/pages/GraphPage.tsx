@@ -4,6 +4,7 @@ import cytoscape from 'cytoscape'
 import type { GraphData, GraphNode, GraphEdge, NodeDetail, CommunityInfo } from '../shared/types'
 import EmptyState from '../components/common/EmptyState'
 import BridgeDetector from '../components/ai/BridgeDetector'
+import PathFinder from '../components/ai/PathFinder'
 
 function getIntimacyColor(intimacy: number): string {
   if (intimacy <= 20) return '#d1d5db'
@@ -84,6 +85,8 @@ export default function GraphPage() {
   const [matchedIds, setMatchedIds] = useState<Set<string>>(new Set())
   const [showExportMenu, setShowExportMenu] = useState(false)
   const [filterOpen, setFilterOpen] = useState(true)
+  const [rightTab, setRightTab] = useState<'pathfinder' | 'bridge'>('pathfinder')
+  const [personList, setPersonList] = useState<{ id: string; name: string }[]>([])
 
   const containerRef = useRef<HTMLDivElement>(null)
   const cyRef = useRef<cytoscape.Core | null>(null)
@@ -251,6 +254,35 @@ export default function GraphPage() {
       setDetailLoading(false)
     })
   }, [selectedNodeId])
+
+  useEffect(() => {
+    if (data && data.nodes.length > 0) {
+      setPersonList(data.nodes.map(n => ({ id: n.id, name: n.name })))
+    }
+  }, [data])
+
+  const handleHighlightPath = useCallback((personIds: string[]) => {
+    const cy = cyRef.current
+    if (!cy) return
+    cy.nodes().forEach(node => {
+      if (personIds.includes(node.id())) {
+        node.removeClass('search-dim')
+        node.addClass('search-highlight')
+      } else {
+        node.removeClass('search-highlight')
+        node.addClass('search-dim')
+      }
+    })
+    cy.edges().forEach(edge => {
+      const src = edge.data('source')
+      const tgt = edge.data('target')
+      if (personIds.includes(src) && personIds.includes(tgt)) {
+        edge.removeClass('search-dim')
+      } else {
+        edge.addClass('search-dim')
+      }
+    })
+  }, [])
 
   useEffect(() => {
     const cy = cyRef.current
@@ -835,7 +867,35 @@ export default function GraphPage() {
       </div>
 
       <div className="w-72 flex-shrink-0">
-        <BridgeDetector />
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-4">
+          <div className="flex border-b border-gray-100">
+            <button
+              onClick={() => setRightTab('pathfinder')}
+              className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${
+                rightTab === 'pathfinder'
+                  ? 'text-primary-600 border-b-2 border-primary-500 bg-primary-50/50'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              路径查找
+            </button>
+            <button
+              onClick={() => setRightTab('bridge')}
+              className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${
+                rightTab === 'bridge'
+                  ? 'text-primary-600 border-b-2 border-primary-500 bg-primary-50/50'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              桥接人
+            </button>
+          </div>
+        </div>
+        {rightTab === 'pathfinder' ? (
+          <PathFinder persons={personList} onHighlightPath={handleHighlightPath} />
+        ) : (
+          <BridgeDetector />
+        )}
       </div>
       </div>
     </div>

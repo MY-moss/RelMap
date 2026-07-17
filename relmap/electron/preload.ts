@@ -19,6 +19,8 @@ const api: ElectronAPI = {
     create: (data) => ipcRenderer.invoke('person:create', data),
     update: (id, data) => ipcRenderer.invoke('person:update', id, data),
     delete: (id) => ipcRenderer.invoke('person:delete', id),
+    batchTag: (personIds, tagIds) => ipcRenderer.invoke('person:batchTag', personIds, tagIds),
+    batchDelete: (ids) => ipcRenderer.invoke('person:batchDelete', ids),
     getById: (id) => ipcRenderer.invoke('person:getById', id),
     list: (filter) => ipcRenderer.invoke('person:list', filter),
     toggleFavorite: (id) => ipcRenderer.invoke('person:toggleFavorite', id),
@@ -224,6 +226,9 @@ const api: ElectronAPI = {
   bridge: {
     detect: (topN) => ipcRenderer.invoke('bridge:detect', topN),
   },
+  pathfinder: {
+    find: (aId, bId, maxPaths) => ipcRenderer.invoke('pathfinder:find', aId, bId, maxPaths),
+  },
   graph_enhanced: {
     getNodeDetails: (personId) => ipcRenderer.invoke('graph:getNodeDetails', personId),
     getCommunities: () => ipcRenderer.invoke('graph:getCommunities'),
@@ -277,6 +282,8 @@ const api: ElectronAPI = {
     saveSession: (session) => ipcRenderer.invoke('chat:history:save', session),
     deleteSession: (id) => ipcRenderer.invoke('chat:history:delete', id),
     clearHistory: () => ipcRenderer.invoke('chat:history:clear'),
+    searchHistory: (query) => ipcRenderer.invoke('chat:history:search', query),
+    extractInfo: (sessionId) => ipcRenderer.invoke('chat:history:extractInfo', sessionId),
   },
 }
 

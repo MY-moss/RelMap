@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import type { PersonFilter } from '../shared/types'
 import PersonCard from '../components/persons/PersonCard'
 import CreatePersonModal from '../components/persons/CreatePersonModal'
+import BatchTagModal from '../components/tags/BatchTagModal'
+import BatchGroupModal from '../components/groups/BatchGroupModal'
 import AIImportWizard from '../components/ai/AIImportWizard'
 import EmptyState from '../components/common/EmptyState'
 import { usePersonList, useToggleFavorite, useMainPerson, useTagList } from '../hooks'
@@ -26,6 +28,13 @@ export default function PersonsPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [aiImportOpen, setAiImportOpen] = useState(false)
 
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const lastClickedIndex = useRef(-1)
+  const [batchTagOpen, setBatchTagOpen] = useState(false)
+  const [batchGroupOpen, setBatchGroupOpen] = useState(false)
+  const [batchDeleteConfirm, setBatchDeleteConfirm] = useState(false)
+  const [batchDeleting, setBatchDeleting] = useState(false)
+
   const { data: mainPerson } = useMainPerson()
   const { data: tags = [] } = useTagList()
 
@@ -40,6 +49,10 @@ export default function PersonsPage() {
   const { data: persons = [], isLoading: loading } = usePersonList(filter)
 
   const toggleFav = useToggleFavorite()
+
+  useEffect(() => {
+    setSelectedIds(new Set())
+  }, [debouncedKeyword, onlyFavorite, selectedTagId, sortBy])
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedKeyword(keyword), 300)
@@ -60,6 +73,50 @@ export default function PersonsPage() {
 
   const handleSaved = () => {
     queryClient.invalidateQueries({ queryKey: personKeys.lists() })
+  }
+
+  const handleToggleSelect = (id: string, index: number, shiftKey: boolean) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (shiftKey && lastClickedIndex.current !== -1) {
+        const start = Math.min(lastClickedIndex.current, index)
+        const end = Math.max(lastClickedIndex.current, index)
+        for (let i = start; i <= end; i++) {
+          if (persons[i]) next.add(persons[i].id)
+        }
+      } else {
+        if (next.has(id)) next.delete(id)
+        else next.add(id)
+      }
+      lastClickedIndex.current = index
+      return next
+    })
+  }
+
+  const handleSelectAll = useCallback(() => {
+    if (selectedIds.size === persons.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(persons.map((p) => p.id)))
+    }
+  }, [selectedIds.size, persons])
+
+  const handleBatchDelete = async () => {
+    setBatchDeleting(true)
+    try {
+      const ids = Array.from(selectedIds)
+      const r = await window.electronAPI.person.batchDelete(ids)
+      if (!r.success) throw new Error(r.error)
+      queryClient.invalidateQueries({ queryKey: personKeys.lists() })
+      setSelectedIds(new Set())
+      setBatchDeleteConfirm(false)
+      alert(`已删除 ${r.data.deleted} 人`)
+    } catch (e) {
+      console.error('batch delete failed:', e)
+      alert('批量删除失败: ' + (e as Error).message)
+    } finally {
+      setBatchDeleting(false)
+    }
   }
 
   return (
@@ -199,15 +256,127 @@ export default function PersonsPage() {
       ) : persons.length === 0 ? (
         <EmptyState title={t('person.empty_title')} description={t('person.empty_description')} action={{ label: t('person.create'), onClick: () => setModalOpen(true) }} />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {persons.map((person) => (
-            <PersonCard
-              key={person.id}
-              person={person}
-              onClick={handleClickPerson}
-              onToggleFavorite={handleToggleFavorite}
-            />
-          ))}
+        <div>
+          {/* Select all bar */}
+          {persons.length > 5 && (
+            <div className="flex items-center gap-2 mb-3 px-1">
+              <label className="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.size === persons.length && persons.length > 0}
+                  onChange={handleSelectAll}
+                  className="w-4 h-4 rounded border-gray-300 text-primary-500 focus:ring-primary-500"
+                />
+                {selectedIds.size > 0 ? `已选 ${selectedIds.size}/${persons.length}` : '全选'}
+              </label>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {persons.map((person, index) => (
+              <div key={person.id} className="relative">
+                <div
+                  className={`absolute top-3 left-3 z-10 w-6 h-6 rounded-full flex items-center justify-center cursor-pointer transition-all ${
+                    selectedIds.has(person.id)
+                      ? 'bg-primary-500 text-white'
+                      : 'bg-white/80 border border-gray-300 text-transparent hover:border-primary-400'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleToggleSelect(person.id, index, e.shiftKey)
+                  }}
+                >
+                  {selectedIds.has(person.id) && (
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                  )}
+                </div>
+                <PersonCard
+                  person={person}
+                  onClick={handleClickPerson}
+                  onToggleFavorite={handleToggleFavorite}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Batch action toolbar */}
+      {selectedIds.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-white border border-gray-200 rounded-xl shadow-lg px-5 py-3 flex items-center gap-3">
+          <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
+            已选 {selectedIds.size} 人
+          </span>
+          <div className="w-px h-5 bg-gray-200" />
+          <button
+            onClick={() => setBatchTagOpen(true)}
+            className="px-3 py-1.5 text-sm bg-primary-50 text-primary-600 hover:bg-primary-100 rounded-lg transition-colors"
+          >
+            批量标签
+          </button>
+          <button
+            onClick={() => setBatchGroupOpen(true)}
+            className="px-3 py-1.5 text-sm bg-primary-50 text-primary-600 hover:bg-primary-100 rounded-lg transition-colors"
+          >
+            加入群组
+          </button>
+          <button
+            onClick={() => setBatchDeleteConfirm(true)}
+            className="px-3 py-1.5 text-sm bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+          >
+            批量删除
+          </button>
+          <div className="w-px h-5 bg-gray-200" />
+          <button
+            onClick={() => setSelectedIds(new Set())}
+            className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            取消
+          </button>
+        </div>
+      )}
+
+      <BatchTagModal
+        open={batchTagOpen}
+        personIds={Array.from(selectedIds)}
+        onClose={() => setBatchTagOpen(false)}
+        onDone={handleSaved}
+      />
+      <BatchGroupModal
+        open={batchGroupOpen}
+        personIds={Array.from(selectedIds)}
+        onClose={() => setBatchGroupOpen(false)}
+        onDone={handleSaved}
+      />
+
+      {/* Batch delete confirm dialog */}
+      {batchDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/30" onClick={() => !batchDeleting && setBatchDeleteConfirm(false)} />
+          <div className="relative bg-white rounded-xl shadow-xl max-w-sm w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">确认批量删除</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              确定要删除选中的 {selectedIds.size} 位联系人吗？此操作不可撤销。
+            </p>
+            <div className="flex items-center justify-end gap-2">
+              <button
+                onClick={() => setBatchDeleteConfirm(false)}
+                disabled={batchDeleting}
+                className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleBatchDelete}
+                disabled={batchDeleting}
+                className="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white rounded-lg transition-colors"
+              >
+                {batchDeleting ? '删除中...' : `确认删除 ${selectedIds.size} 人`}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

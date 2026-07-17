@@ -13,12 +13,14 @@ import {
   createPerson,
   updatePerson,
   deletePerson,
+  deletePersons,
   getPersonById,
   listPersons,
   togglePersonFavorite,
   setPersonMainIdentity,
   getMainPerson,
 } from '../../src/main/db/repositories/person.repo'
+import { applyTagsToTarget } from '../../src/main/db/repositories/tags.repo'
 import { createReminder, listReminders } from '../../src/main/db/repositories/reminders.repo'
 
 export function registerPersonIPC(): void {
@@ -83,6 +85,28 @@ export function registerPersonIPC(): void {
       return deletePerson(id)
     } catch (e) {
       logIpcError('person:delete', e)
+      return { success: false, error: (e as Error).message }
+    }
+  })
+
+  ipcMain.handle('person:batchTag', async (_event, personIds: string[], tagIds: string[]): Promise<Result<void>> => {
+    try {
+      for (const pid of personIds) {
+        const r = applyTagsToTarget(pid, 'person', tagIds)
+        if (!r.success) return r
+      }
+      return { success: true, data: undefined }
+    } catch (e) {
+      logIpcError('person:batchTag', e)
+      return { success: false, error: (e as Error).message }
+    }
+  })
+
+  ipcMain.handle('person:batchDelete', async (_event, ids: string[]): Promise<Result<{ deleted: number }>> => {
+    try {
+      return deletePersons(ids)
+    } catch (e) {
+      logIpcError('person:batchDelete', e)
       return { success: false, error: (e as Error).message }
     }
   })

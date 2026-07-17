@@ -709,6 +709,22 @@ export interface IntimacyPrediction {
   confidence: number;
 }
 
+// ==================== 关系路径查找类型 ====================
+
+export interface PathStep {
+  personId: string
+  personName: string
+  avatarPath: string | null
+  relationLabel?: string | null
+  relationIntimacy?: number
+}
+
+export interface PathResult {
+  found: boolean
+  paths: PathStep[][]
+  totalPaths?: number
+}
+
 // ==================== 桥接人识别类型 ====================
 
 export interface BridgePerson {
@@ -820,6 +836,8 @@ export interface ElectronAPI {
     create(data: CreatePersonDto): Promise<Result<Person>>;
     update(id: string, data: UpdatePersonDto): Promise<Result<Person>>;
     delete(id: string): Promise<Result<void>>;
+    batchTag(personIds: string[], tagIds: string[]): Promise<Result<void>>;
+    batchDelete(ids: string[]): Promise<Result<{ deleted: number }>>;
     getById(id: string): Promise<Result<Person>>;
     list(filter?: PersonFilter): Promise<Result<Person[]>>;
     toggleFavorite(id: string): Promise<Result<Person>>;
@@ -967,6 +985,9 @@ export interface ElectronAPI {
   bridge: {
     detect(topN?: number): Promise<Result<BridgePerson[]>>;
   };
+  pathfinder: {
+    find(aId: string, bId: string, maxPaths?: number): Promise<Result<PathResult>>;
+  };
   analytics: {
     getLifecycleDistribution(): Promise<Result<LifecycleDistribution[]>>;
     getMonthlyInteractionTrend(months: number): Promise<Result<MonthlyTrend[]>>;
@@ -1029,6 +1050,8 @@ export interface ElectronAPI {
     saveSession: (session: { id?: string; title: string; messages: { role: string; content: string }[]; systemPrompt?: string }) => Promise<{ success: boolean; error?: string }>;
     deleteSession: (id: string) => Promise<{ success: boolean; error?: string }>;
     clearHistory: () => Promise<{ success: boolean; error?: string }>;
+    searchHistory: (query: string) => Promise<{ success: boolean; data?: ChatSearchResult[]; error?: string }>;
+    extractInfo: (sessionId: string) => Promise<{ success: boolean; data?: ExtractedContactInfo; error?: string }>;
   };
   update: {
     checkForUpdates: () => Promise<UpdateCheckResult>;
@@ -1089,6 +1112,51 @@ export interface PasswordStrength {
   score: number
   label: string
   feedback: string
+}
+
+// ==================== 仪表盘 Widget ====================
+
+export type WidgetType =
+  | 'stats-overview'
+  | 'recent-activity'
+  | 'intimacy-distribution'
+  | 'lifecycle-distribution'
+  | 'monthly-trend'
+  | 'lost-contact'
+  | 'reminders'
+  | 'main-identity'
+
+export interface WidgetConfig {
+  type: WidgetType
+  visible: boolean
+  order: number
+}
+
+export interface DashboardConfig {
+  widgets: WidgetConfig[]
+}
+
+// ==================== 聊天历史搜索 ====================
+
+export interface ChatSearchResult {
+  sessionId: string
+  sessionTitle: string
+  matchCount: number
+  matches: { role: string; content: string; index: number }[]
+  updatedAt: string
+}
+
+// ==================== 聊天提取信息 ====================
+
+export interface ExtractedContactInfo {
+  name?: string
+  company?: string
+  title?: string
+  email?: string
+  phone?: string
+  notes?: string
+  sourceSessionId?: string
+  sourceSessionTitle?: string
 }
 
 

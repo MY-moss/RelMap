@@ -28,6 +28,9 @@ export interface AppConfig {
   darkMode?: boolean
   colorTheme?: string
   glassMode?: 'none' | 'frosted' | 'translucent'
+  dashboard?: {
+    widgets: Array<{ type: string; visible: boolean; order: number }>
+  }
 }
 
 function deriveKey(): Buffer {

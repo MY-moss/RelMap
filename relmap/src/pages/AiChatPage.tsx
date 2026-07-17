@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Person } from '../shared/types'
+import ChatSearchBar from '../components/chat/ChatSearchBar'
+import ExtractedInfoPanel from '../components/chat/ExtractedInfoPanel'
 
 interface ChatMsg {
   role: 'user' | 'assistant' | 'system'
@@ -269,6 +271,9 @@ export default function AiChatPage() {
               + 新对话
             </button>
           </div>
+          <div className="px-2 pt-2">
+            <ChatSearchBar />
+          </div>
           <div className="flex-1 overflow-y-auto p-2 space-y-1">
             {sessions.map(s => (
               <div
@@ -489,6 +494,16 @@ export default function AiChatPage() {
           <div ref={messagesEndRef} />
         </div>
         </div>
+
+        {/* Info extraction */}
+        {currentSessionId && messages.length > 2 && (
+          <div className="px-4 py-2 border-t border-gray-100">
+            <ExtractedInfoPanel
+              sessionId={currentSessionId}
+              onClose={() => {}}
+            />
+          </div>
+        )}
 
         {/* Input */}
         <div className="border-t border-gray-200 px-4 py-3 flex-shrink-0">

@@ -155,6 +155,31 @@ export function deletePerson(id: string): Result<void> {
   }
 }
 
+export function deletePersons(ids: string[]): Result<{ deleted: number }> {
+  try {
+    const db = getDb()
+    const deleteTaggings = db.prepare("DELETE FROM taggings WHERE target_id = ? AND target_type = 'person'")
+    const deleteExternalIds = db.prepare("DELETE FROM external_ids WHERE target_id = ? AND target_type = 'person'")
+    const deletePerson = db.prepare('DELETE FROM persons WHERE id = ?')
+    let deleted = 0
+    const tx = db.transaction(() => {
+      for (const id of ids) {
+        deleteTaggings.run(id)
+        deleteExternalIds.run(id)
+        const result = deletePerson.run(id)
+        if (result.changes > 0) {
+          deleted++
+          pluginManager.emitEvent('person:deleted', { id }).catch(() => {})
+        }
+      }
+    })
+    tx()
+    return { success: true, data: { deleted } }
+  } catch (e) {
+    return { success: false, error: (e as Error).message }
+  }
+}
+
 export function getPersonById(id: string): Result<Person> {
   try {
     const db = getDb()

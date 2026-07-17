@@ -29,6 +29,7 @@ import { registerSuggestionIPC } from './suggestion.ipc'
 import { registerPersonalityIPC } from './personality.ipc'
 import { registerIntimacyPredictionIPC } from './intimacy_prediction.ipc'
 import { registerBridgeIPC } from './bridge.ipc'
+import { registerPathfinderIPC } from './pathfinder.ipc'
 import { registerWrappedIPC } from './wrapped.ipc'
 import { registerMemoryCapsuleIPC } from './memory_capsule.ipc'
 import { registerGraphEnhancedIPC } from './graph_enhanced.ipc'
@@ -104,6 +105,9 @@ export function registerAllIPC(): void {
 
   // ========== Phase 13 桥接人识别 ==========
   registerBridgeIPC()
+
+  // ========== Phase 13 关系路径查找 ==========
+  registerPathfinderIPC()
 
   // ========== Phase 13 RelMap Wrapped & 记忆胶囊 ==========
   registerWrappedIPC()

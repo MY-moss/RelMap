@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Home, ClipboardList, Users, Share2, Bot, BarChart3,
-  Timeline, Image, Settings, HelpCircle, Calendar
+  Timeline, Image, Settings, HelpCircle, Calendar, Award
 } from 'lucide-react'
 import GlobalSearch from '../search/GlobalSearch'
 import RewardButton from '../common/RewardButton'
@@ -17,11 +17,12 @@ const navItems = [
   { to: '/graph', labelKey: 'graph', icon: Share2 },
   { to: '/ai', labelKey: 'ai_assistant', icon: Bot },
   { to: '/analytics', labelKey: 'analytics', icon: BarChart3 },
+  { to: '/calendar', labelKey: 'calendar', icon: Calendar },
   { to: '/timeline', labelKey: 'timeline', icon: Timeline },
   { to: '/photos', labelKey: 'photos', icon: Image },
+  { to: '/wrapped', labelKey: 'wrapped', icon: Award },
   { to: '/settings', labelKey: 'settings', icon: Settings },
   { to: '/help', labelKey: 'help', icon: HelpCircle },
-  { to: '/wrapped', labelKey: 'wrapped', icon: Calendar },
 ]
 
 export default function AppLayout() {

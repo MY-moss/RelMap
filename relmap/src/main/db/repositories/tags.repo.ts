@@ -177,6 +177,28 @@ export function applyTag(
   }
 }
 
+export function applyTagsToTarget(
+  targetId: string,
+  targetType: TagTargetType,
+  tagIds: string[]
+): Result<void> {
+  try {
+    const db = getDb()
+    const insert = db.prepare(
+      'INSERT OR IGNORE INTO taggings (tag_id, target_id, target_type) VALUES (?, ?, ?)'
+    )
+    const tx = db.transaction(() => {
+      for (const tagId of tagIds) {
+        insert.run(tagId, targetId, targetType)
+      }
+    })
+    tx()
+    return { success: true, data: undefined }
+  } catch (e) {
+    return { success: false, error: (e as Error).message }
+  }
+}
+
 export function removeTag(
   tagId: string,
   targetId: string,
